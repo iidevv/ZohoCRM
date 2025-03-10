@@ -22,6 +22,7 @@ use com\zoho\crm\api\util\Choice;
 use com\zoho\crm\api\record\ActionWrapper;
 use com\zoho\crm\api\record\SuccessResponse;
 use com\zoho\crm\api\record\APIException;
+use Iidev\ZohoCRM\Core\Data\Converter\Main;
 use XLite\InjectLoggerTrait;
 
 class PushProductsCommand implements ICommand
@@ -29,6 +30,7 @@ class PushProductsCommand implements ICommand
     use InjectLoggerTrait;
 
     private array $productIds;
+    private array $entities = [];
 
     public function __construct(
         array $productIds
@@ -44,14 +46,19 @@ class PushProductsCommand implements ICommand
             $bodyWrapper = new BodyWrapper();
             $records = $this->getProducts();
 
+            if (empty($records)) {
+                return;
+            }
+
             $bodyWrapper->setData($records);
             $headerInstance = new HeaderMap();
             $response = $recordOperations->createRecords($bodyWrapper, $headerInstance);
-           
+
             $this->processResult($response);
         } catch (Exception $e) {
-            $this->getLogger('ZohoCRM')->error('', [
-                $e->getMessage(),
+            $this->getLogger('ZohoCRM')->error('PushProductsCommand Error:', [
+                'message' => $e->getMessage(),
+                'trace' => $e->getTraceAsString(),
             ]);
         }
     }
@@ -59,93 +66,117 @@ class PushProductsCommand implements ICommand
     protected function processResult($response)
     {
         if ($response != null) {
-            echo ("Status Code: " . $response->getStatusCode() . "<br>");
             $actionHandler = $response->getObject();
             if ($actionHandler instanceof ActionWrapper) {
-                $actionWrapper = $actionHandler;
-                $actionResponses = $actionWrapper->getData();
+                $actionResponses = $actionHandler->getData();
+
+                $index = 0;
                 foreach ($actionResponses as $actionResponse) {
                     if ($actionResponse instanceof SuccessResponse) {
-                        $successResponse = $actionResponse;
-                        echo ("Status: " . $successResponse->getStatus()->getValue() . "<br>");
-                        echo ("Code: " . $successResponse->getCode()->getValue() . "<br>");
-                        echo ("Details: ");
-                        foreach ($successResponse->getDetails() as $key => $value) {
-                            echo ($key . " : ");
-                            print_r($value);
-                            echo ("<br>");
+                        $details = $actionResponse->getDetails();
+                        if (isset($details['id'])) {
+                            $zohoId = $details['id'];
+                            $product = $this->entities[$index];
+                            if ($product) {
+                                $product->setZohoId($zohoId);
+                            }
                         }
-                        echo ("Message: " . ($successResponse->getMessage() instanceof Choice ? $successResponse->getMessage()->getValue() : $successResponse->getMessage()) . "<br>");
                     } else if ($actionResponse instanceof APIException) {
-                        $exception = $actionResponse;
-                        echo ("Status: " . $exception->getStatus()->getValue() . "<br>");
-                        echo ("Code: " . $exception->getCode()->getValue() . "<br>");
-                        echo ("Details: ");
-                        foreach ($exception->getDetails() as $key => $value) {
-                            echo ($key . " : ");
-                            print_r($value);
-                            echo ("<br>");
-                        }
-                        echo ("Message : " . ($exception->getMessage() instanceof Choice ? $exception->getMessage()->getValue() : $exception->getMessage()) . "<br>");
+                        $this->getLogger('ZohoCRM')->error('APIException:', [
+                            $actionResponse->getStatus(),
+                            $actionResponse->getCode(),
+                        ]);
                     }
+                    $index++;
                 }
-            } else if ($actionHandler instanceof APIException) {
-                $exception = $actionHandler;
-                echo ("Status: " . $exception->getStatus()->getValue() . "<br>");
-                echo ("Code: " . $exception->getCode()->getValue() . "<br>");
-                echo ("Details: ");
-                foreach ($exception->getDetails() as $key => $value) {
-                    echo ($key . " : " . $value . "<br>");
-                }
-                echo ("Message : " . ($exception->getMessage() instanceof Choice ? $exception->getMessage()->getValue() : $exception->getMessage()) . "<br>");
+
+                Database::getEM()->flush();
             }
         }
-        die();
-        // if (
-        //     isset($result['Status'])
-        //     && $result['Status'] === self::STATUS_SUCCESS
-        // ) {
-        //     foreach ($this->productIds as $id) {
-        //         /** @var Product $product */
-        //         $product = Database::getRepo(Product::class)->find($id);
-        //         $product->setIsSkuvaultSynced(true);
-        //         $product->setIsSkuvaultUpdateSynced(true);
-        //     }
-
-        //     Database::getEM()->flush();
-        // }
     }
 
-    protected function getProducts()  {
+    protected function getProducts()
+    {
         $records = [];
         $products = Database::getRepo(Product::class)->findByIds($this->productIds);
 
         foreach ($products as $product) {
-            $records[] = $this->getProduct($product);
+            if ($product->hasVariants()) {
+                $product->setZohoId('exluded');
+                $records = array_merge($records, $this->getVariants($product));
+            } else {
+                $records[] = $this->getProduct($product);
+                $this->entities[] = $product;
+            }
         }
 
         return $records;
     }
 
-    protected function getProduct(Product $product) {
+    protected function getProduct(Product $product)
+    {
         $record = new Record();
+
+        $record->addFieldValue(Products::ProductName(), $product->getName());
+        $record->addFieldValue(Products::ProductCode(), $product->getSku());
+        $record->addFieldValue(Products::QtyInStock(), (double) $product->getAmount());
+        $record->addFieldValue(Products::UnitPrice(), $product->getPrice());
+        $record->addFieldValue(Products::Tax(), 0);
+        $record->addFieldValue(Products::Description(), Main::getFormattedDescription($product->getBriefDescription()));
+        $record->addFieldValue(Products::ProductActive(), true);
+
         $category = new Choice("-None-");
         $record->addFieldValue(Products::ProductCategory(), $category);
-        $record->addFieldValue(Products::QtyInDemand(), $product->getAmount());
+
         $owner = new MinifiedUser();
         $owner->setId(Config::getInstance()->Iidev->ZohoCRM->owner_id);
 
         // updateRecords
         // $record->addFieldValue(Products::id(), "6530264000000618002");
         $record->addFieldValue(Products::Owner(), $owner);
-        $record->addFieldValue(Products::Description(), $product->getBriefDescription());
-        $record->addFieldValue(Products::Tax(), 0);
-        $record->addFieldValue(Products::ProductActive(), true);
-        $record->addFieldValue(Products::ProductCode(), $product->getSku());
-        // $manufacturer = new Choice("manufacturer1");
-        // $record->addFieldValue(Products::Manufacturer(), $manufacturer);
-        $record->addFieldValue(Products::ProductName(), $product->getName());
 
         return $record;
+    }
+
+    protected function getVariants(Product $product)
+    {
+        $records = [];
+        $variants = $product->getVariants();
+
+        foreach ($variants as $variant) {
+            $record = new Record();
+
+            $record->addFieldValue(Products::ProductName(), $this->getVariantTitle($variant));
+            $record->addFieldValue(Products::ProductCode(), $variant->getSku());
+            $record->addFieldValue(Products::QtyInStock(), (double) $variant->getAmount());
+            $record->addFieldValue(Products::UnitPrice(), $variant->getPrice());
+            $record->addFieldValue(Products::Tax(), 0);
+            $record->addFieldValue(Products::Description(), Main::getFormattedDescription($product->getBriefDescription()));
+            $record->addFieldValue(Products::ProductActive(), true);
+
+            $category = new Choice("-None-");
+            $record->addFieldValue(Products::ProductCategory(), $category);
+
+            $owner = new MinifiedUser();
+            $owner->setId(Config::getInstance()->Iidev->ZohoCRM->owner_id);
+
+            $record->addFieldValue(Products::Owner(), $owner);
+
+            $records[] = $record;
+
+            $this->entities[] = $variant;
+        }
+
+        return $records;
+    }
+
+    protected function getVariantTitle(\XC\ProductVariants\Model\ProductVariant $model)
+    {
+        $attrsString = array_reduce($model->getValues(), static function ($str, $attr) {
+            $str .= $attr->asString() . ' ';
+            return $str;
+        }, '');
+
+        return $model->getProduct()->getName() . ' ' . trim($attrsString);
     }
 }

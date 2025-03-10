@@ -9,9 +9,10 @@ use XCart\Extender\Mapping\Extender;
 /**
  * @Extender\Mixin
  */
-class Product extends \XLite\Model\Product
+class ProductVariant extends \XC\ProductVariants\Model\ProductVariant
 {
     /**
+     *
      * @var string
      * @ORM\Column (type="string", nullable=true)
      */
