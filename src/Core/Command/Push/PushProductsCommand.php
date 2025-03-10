@@ -8,13 +8,9 @@ use XLite\Core\Database;
 use XLite\Model\Product;
 use Iidev\ZohoCRM\Core\SDK\SDK;
 use XLite\Core\Config;
-use com\zoho\crm\api\record\GetRecordsParam;
 use com\zoho\crm\api\HeaderMap;
-use com\zoho\crm\api\ParameterMap;
 use com\zoho\crm\api\record\RecordOperations;
-use com\zoho\crm\api\record\GetRecordsHeader;
 use com\zoho\crm\api\record\BodyWrapper;
-use com\zoho\crm\api\tags\Tag;
 use com\zoho\crm\api\record\Products;
 use com\zoho\crm\api\record\Record;
 use com\zoho\crm\api\users\MinifiedUser;
@@ -131,8 +127,6 @@ class PushProductsCommand implements ICommand
         $owner = new MinifiedUser();
         $owner->setId(Config::getInstance()->Iidev->ZohoCRM->owner_id);
 
-        // updateRecords
-        // $record->addFieldValue(Products::id(), "6530264000000618002");
         $record->addFieldValue(Products::Owner(), $owner);
 
         return $record;
