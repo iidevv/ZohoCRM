@@ -1,0 +1,15 @@
+XLite\Model\Config:
+  - name: owner_id
+    category: Iidev\ZohoCRM
+    type: text
+    orderby: 100
+    translations:
+      - code: en
+        option_name: "Owner ID"
+  - name: debug_enabled
+    category: Iidev\ZohoCRM
+    type: XLite\View\FormField\Input\Checkbox\OnOffWithoutOffLabel
+    orderby: 200
+    translations:
+      - code: en
+        option_name: "Enable debugging"

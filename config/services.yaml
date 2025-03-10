@@ -1,0 +1,31 @@
+#
+# Module services
+#
+
+services:
+  _defaults:
+      autowire: true
+      autoconfigure: true
+      public: true
+
+  handler:
+    class: Iidev\ZohoCRM\Messenger\Handler\ExportHandler
+    tags:
+      - { name: messenger.message_handler, transport: async }
+  
+  Iidev\ZohoCRM\Messenger\Handler\ExportHandler:
+    tags:
+      - name: messenger.message_handler
+        handles: Qualiteam\SkinActSkuVault\Messenger\Message\ExportMessage
+    
+  Iidev\ZohoCRM\Core\Dispatcher\CreateProductsDispatcher: ~
+
+  Iidev\ZohoCRM\Core\Factory\Commands\PushProductsCommandFactory:
+
+  Iidev\ZohoCRM\Core\Task\CreateProducts:
+    tags:
+      - { name: kernel.event_listener, event: xcart.cronjob, method: handleTask }
+
+  Iidev\ZohoCRM\Command\CreateProductsCommand:
+    tags:
+      - { name: 'console.command', command: 'ZohoCRM:CreateProducts' }

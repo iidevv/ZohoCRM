@@ -1,0 +1,12 @@
+version: 5.5.0.4
+type: common
+authorName: "Ilya I"
+moduleName: "ZohoCRM"
+description: "Zoho CRM integration."
+minorRequiredCoreVersion: 0
+dependsOn: {}
+incompatibleWith: {}
+showSettingsForm: true
+canDisable: true
+autoloader:
+    - vendor/autoload.php

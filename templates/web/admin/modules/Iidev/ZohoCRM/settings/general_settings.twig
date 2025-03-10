@@ -1,0 +1,34 @@
+{% if this.isInitialized() %}
+    <h2>{{ t('Zoho CRM is initialized') }}</h2>
+{% endif %}
+<hr />
+{% form 'Iidev\\ZohoCRM\\View\\Form\\Initialize' %}
+    <ul class="table">
+        <li>
+            {{ widget('XLite\\View\\FormField\\Input\\Text',
+                fieldName='client_id',
+                fieldId='client_id',
+                value='',
+                label=t('Client ID')
+            ) }}
+        </li>
+        <li>
+            {{ widget('XLite\\View\\FormField\\Input\\Text',
+                fieldName='client_secret',
+                fieldId='client_secret',
+                value='',
+                label=t('Client secret')
+            ) }}
+        </li>
+        <li>
+            {{ widget('XLite\\View\\FormField\\Input\\Text',
+                fieldName='scope_code',
+                fieldId='scope_code',
+                value='',
+                label=t('Scope code')
+            ) }}
+        </li>
+        <li>{{ widget('XLite\\View\\Button\\Submit', label=t('Initialize')) }}</li>
+    </ul>
+    
+{% endform %}
