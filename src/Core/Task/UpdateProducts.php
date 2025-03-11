@@ -2,12 +2,12 @@
 
 namespace Iidev\ZohoCRM\Core\Task;
 
-use Iidev\ZohoCRM\Core\Dispatcher\CreateProductsDispatcher;
+use Iidev\ZohoCRM\Core\Dispatcher\UpdateProductsDispatcher;
 use Symfony\Component\Messenger\MessageBusInterface;
 use XCart\Container;
 use XLite\Core\Task\Base\Periodic;
 
-class CreateProducts extends Periodic
+class UpdateProducts extends Periodic
 {
     /**
      * @var mixed|null
@@ -19,7 +19,7 @@ class CreateProducts extends Periodic
      */
     public function getTitle()
     {
-        return static::t('Create products [ZohoCRM]');
+        return static::t('Update products [ZohoCRM]');
     }
 
     /**
@@ -27,7 +27,7 @@ class CreateProducts extends Periodic
      */
     protected function runStep()
     {
-        $dispatcher = new CreateProductsDispatcher();
+        $dispatcher = new UpdateProductsDispatcher();
         $message    = $dispatcher->getMessage();
 
         $this->bus = Container::getContainer() ? Container::getContainer()->get('messenger.default_bus') : null;
@@ -39,7 +39,7 @@ class CreateProducts extends Periodic
      */
     protected function getPeriod()
     {
-        return static::INT_15_MIN;
+        return static::INT_5_MIN;
     }
 
     public function isReady()

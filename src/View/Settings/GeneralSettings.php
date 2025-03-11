@@ -2,8 +2,6 @@
 
 namespace Iidev\ZohoCRM\View\Settings;
 
-use com\zoho\api\authenticator\store\FileStore;
-
 class GeneralSettings extends ASettings
 {
     /**
@@ -17,12 +15,6 @@ class GeneralSettings extends ASettings
     }
     protected function isInitialized()
     {
-        $tokenstore = new FileStore("../zoho_sdk_token.txt");
-        try {
-            $tokenstore->findTokenById(1);
-            return true;
-        } catch (\Exception $e) {
-            return false;
-        }
+        return (new \Iidev\ZohoCRM\Main())->isInitialized();
     }
 }
