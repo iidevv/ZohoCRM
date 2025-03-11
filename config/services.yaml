@@ -19,10 +19,30 @@ services:
         handles: Qualiteam\SkinActSkuVault\Messenger\Message\ExportMessage
 
   Iidev\ZohoCRM\Core\Dispatcher\CreateProductsDispatcher: ~
+  Iidev\ZohoCRM\Core\Dispatcher\UpdateProductsDispatcher: ~
+  Iidev\ZohoCRM\Core\Dispatcher\CreateProfilesDispatcher: ~
 
-  Iidev\ZohoCRM\Core\Factory\Commands\PushProductsCommandFactory:
+  Iidev\ZohoCRM\Core\Factory\Commands\PushProductsCommandFactory: 
+  Iidev\ZohoCRM\Core\Factory\Commands\UpdateProductsCommandFactory: 
+  Iidev\ZohoCRM\Core\Factory\Commands\PushProfilesCommandFactory: 
 
   Iidev\ZohoCRM\Core\Task\CreateProducts:
+    tags:
+      - {
+          name: kernel.event_listener,
+          event: xcart.cronjob,
+          method: handleTask,
+        }
+  
+  Iidev\ZohoCRM\Core\Task\UpdateProducts:
+    tags:
+      - {
+          name: kernel.event_listener,
+          event: xcart.cronjob,
+          method: handleTask,
+        }
+
+  Iidev\ZohoCRM\Core\Task\CreateProfiles:
     tags:
       - {
           name: kernel.event_listener,
@@ -34,18 +54,10 @@ services:
     tags:
       - { name: "console.command", command: "ZohoCRM:CreateProducts" }
 
-  Iidev\ZohoCRM\Core\Dispatcher\UpdateProductsDispatcher: ~
-
-  Iidev\ZohoCRM\Core\Factory\Commands\UpdateProductsCommandFactory:
-
-  Iidev\ZohoCRM\Core\Task\UpdateProducts:
-    tags:
-      - {
-          name: kernel.event_listener,
-          event: xcart.cronjob,
-          method: handleTask,
-        }
-
   Iidev\ZohoCRM\Command\UpdateProductsCommand:
     tags:
       - { name: "console.command", command: "ZohoCRM:UpdateProducts" }
+
+  Iidev\ZohoCRM\Command\CreateProfilesCommand:
+    tags:
+      - { name: "console.command", command: "ZohoCRM:CreateProfiles" }

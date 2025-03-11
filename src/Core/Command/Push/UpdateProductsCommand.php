@@ -65,6 +65,7 @@ class UpdateProductsCommand extends Command
                         $this->getLogger('ZohoCRM')->error('APIException:', [
                             $actionResponse->getStatus(),
                             $actionResponse->getCode(),
+                            $actionResponse->getDetails(),
                         ]);
                     }
 

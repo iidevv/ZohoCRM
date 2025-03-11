@@ -67,19 +67,20 @@ class PushProductsCommand extends Command
 
                 $index = 0;
                 foreach ($actionResponses as $actionResponse) {
+
+                    $product = $this->entities[$index];
+
                     if ($actionResponse instanceof SuccessResponse) {
                         $details = $actionResponse->getDetails();
                         if (isset($details['id'])) {
                             $zohoId = $details['id'];
-                            $product = $this->entities[$index];
-                            if ($product) {
-                                $product->setZohoId($zohoId);
-                            }
+                            
+                            $product->setZohoId($zohoId);
                         }
                     } else if ($actionResponse instanceof APIException) {
                         $this->getLogger('ZohoCRM')->error('APIException:', [
-                            $actionResponse->getStatus(),
-                            $actionResponse->getCode(),
+                            $product->getId(),
+                            $actionResponse->getDetails(),
                         ]);
                     }
                     $index++;
