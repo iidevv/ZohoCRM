@@ -2,22 +2,22 @@
 
 namespace Iidev\ZohoCRM\Command;
 
-use Iidev\ZohoCRM\Core\Dispatcher\CreateProductsDispatcher;
+use Iidev\ZohoCRM\Core\Dispatcher\CreateProductVariantsDispatcher;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Messenger\MessageBusInterface;
 
-class CreateProductsCommand extends Command
+class CreateProductVariantsCommand extends Command
 {
     use LockAwareTrait;
 
-    protected static $defaultName = 'ZohoCRM:CreateProducts';
+    protected static $defaultName = 'ZohoCRM:CreateProductVariants';
 
     protected MessageBusInterface    $bus;
-    protected CreateProductsDispatcher $dispatcher;
+    protected CreateProductVariantsDispatcher $dispatcher;
 
-    public function __construct(MessageBusInterface $bus, CreateProductsDispatcher $dispatcher)
+    public function __construct(MessageBusInterface $bus, CreateProductVariantsDispatcher $dispatcher)
     {
         parent::__construct();
         $this->bus = $bus;

@@ -23,6 +23,12 @@ class Product extends \XLite\Model\Product
      */
     protected $zoho_last_synced = 0;
 
+    /**
+     * @var boolean
+     * @ORM\Column (type="boolean")
+     */
+    protected $zoho_skipped = false;
+
     public function getZohoId()
     {
         return $this->zoho_id;
@@ -43,6 +49,18 @@ class Product extends \XLite\Model\Product
     public function setZohoLastSynced($zoho_last_synced): self
     {
         $this->zoho_last_synced = $zoho_last_synced;
+
+        return $this;
+    }
+
+    public function getZohoSkipped()
+    {
+        return $this->zoho_skipped;
+    }
+
+    public function setZohoSkipped($zoho_skipped): self
+    {
+        $this->zoho_skipped = $zoho_skipped;
 
         return $this;
     }

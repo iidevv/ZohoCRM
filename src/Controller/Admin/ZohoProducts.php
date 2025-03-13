@@ -3,15 +3,22 @@
 namespace Iidev\ZohoCRM\Controller\Admin;
 
 use Iidev\ZohoCRM\Core\Dispatcher\CreateProductsDispatcher;
+use Iidev\ZohoCRM\Core\Dispatcher\CreateProductVariantsDispatcher;
 use Iidev\ZohoCRM\Core\Dispatcher\UpdateProductsDispatcher;
+use Iidev\ZohoCRM\Core\Dispatcher\UpdateProductVariantsDispatcher;
 use XLite\Core\Converter;
 
 class ZohoProducts extends Zoho
 {
     protected function doActionCreateZohoProducts()
     {
-        $dispatcher = new CreateProductsDispatcher();
-        $message    = $dispatcher->getMessage();
+        $dispatcherProducts = new CreateProductsDispatcher();
+        $message    = $dispatcherProducts->getMessage();
+        
+        $this->bus->dispatch($message);
+
+        $dispatcherVariants = new CreateProductVariantsDispatcher();
+        $message    = $dispatcherVariants->getMessage();
         
         $this->bus->dispatch($message);
 
@@ -20,9 +27,14 @@ class ZohoProducts extends Zoho
 
     protected function doActionUpdateZohoProducts()
     {
-        $dispatcher = new UpdateProductsDispatcher();
-        $message    = $dispatcher->getMessage();
+        $dispatcherProducts = new UpdateProductsDispatcher();
+        $message    = $dispatcherProducts->getMessage();
+        
+        $this->bus->dispatch($message);
 
+        $dispatcherVariants = new UpdateProductVariantsDispatcher();
+        $message    = $dispatcherVariants->getMessage();
+        
         $this->bus->dispatch($message);
 
         $this->setReturnURL(Converter::buildURL(\Iidev\ZohoCRM\View\Tabs\Zoho::TAB_PRODUCTS));

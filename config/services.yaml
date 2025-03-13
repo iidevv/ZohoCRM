@@ -19,12 +19,16 @@ services:
         handles: Qualiteam\SkinActSkuVault\Messenger\Message\ExportMessage
 
   Iidev\ZohoCRM\Core\Dispatcher\CreateProductsDispatcher: ~
+  Iidev\ZohoCRM\Core\Dispatcher\CreateProductVariantsDispatcher: ~
   Iidev\ZohoCRM\Core\Dispatcher\UpdateProductsDispatcher: ~
+  Iidev\ZohoCRM\Core\Dispatcher\UpdateProductVariantsDispatcher: ~
   Iidev\ZohoCRM\Core\Dispatcher\CreateProfilesDispatcher: ~
   Iidev\ZohoCRM\Core\Dispatcher\CreateOrdersDispatcher: ~
 
   Iidev\ZohoCRM\Core\Factory\Commands\PushProductsCommandFactory:
+  Iidev\ZohoCRM\Core\Factory\Commands\PushProductVariantsCommandFactory:
   Iidev\ZohoCRM\Core\Factory\Commands\UpdateProductsCommandFactory:
+  Iidev\ZohoCRM\Core\Factory\Commands\UpdateVariantsCommandFactory:
   Iidev\ZohoCRM\Core\Factory\Commands\PushProfilesCommandFactory:
   Iidev\ZohoCRM\Core\Factory\Commands\PushOrdersCommandFactory:
 
@@ -64,9 +68,17 @@ services:
     tags:
       - { name: "console.command", command: "ZohoCRM:CreateProducts" }
 
+  Iidev\ZohoCRM\Command\CreateProductVariantsCommand:
+    tags:
+      - { name: "console.command", command: "ZohoCRM:CreateProductVariants" }
+
   Iidev\ZohoCRM\Command\UpdateProductsCommand:
     tags:
       - { name: "console.command", command: "ZohoCRM:UpdateProducts" }
+
+  Iidev\ZohoCRM\Command\UpdateProductVariantsCommand:
+    tags:
+      - { name: "console.command", command: "ZohoCRM:UpdateProductVariants" }
 
   Iidev\ZohoCRM\Command\CreateProfilesCommand:
     tags:

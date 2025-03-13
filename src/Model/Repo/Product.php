@@ -14,6 +14,7 @@ class Product extends \XLite\Model\Repo\Product
         return $this->createQueryBuilder('p')
             ->where('p.enabled = :enabled')
             ->andWhere('p.zoho_id IS NULL')
+            ->andWhere('p.zoho_skipped = false')
             ->setParameter('enabled', 1)
             ->select('p.product_id')
             ->setMaxResults(30)

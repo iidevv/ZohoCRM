@@ -3,6 +3,7 @@
 namespace Iidev\ZohoCRM\Core\Task;
 
 use Iidev\ZohoCRM\Core\Dispatcher\CreateProductsDispatcher;
+use Iidev\ZohoCRM\Core\Dispatcher\CreateProductVariantsDispatcher;
 use Symfony\Component\Messenger\MessageBusInterface;
 use XCart\Container;
 use XLite\Core\Task\Base\Periodic;
@@ -27,10 +28,14 @@ class CreateProducts extends Periodic
      */
     protected function runStep()
     {
-        $dispatcher = new CreateProductsDispatcher();
-        $message    = $dispatcher->getMessage();
-
         $this->bus = Container::getContainer() ? Container::getContainer()->get('messenger.default_bus') : null;
+
+        $dispatcherProducts = new CreateProductsDispatcher();
+        $message    = $dispatcherProducts->getMessage();
+        $this->bus->dispatch($message);
+        
+        $dispatcherVariants = new CreateProductVariantsDispatcher();
+        $message    = $dispatcherVariants->getMessage();
         $this->bus->dispatch($message);
     }
 

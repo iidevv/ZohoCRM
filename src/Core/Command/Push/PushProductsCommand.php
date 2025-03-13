@@ -74,8 +74,9 @@ class PushProductsCommand extends Command
                         $details = $actionResponse->getDetails();
                         if (isset($details['id'])) {
                             $zohoId = $details['id'];
-                            
+
                             $product->setZohoId($zohoId);
+                            Database::getEM()->persist($product);
                         }
                     } else if ($actionResponse instanceof APIException) {
                         $this->getLogger('ZohoCRM')->error('APIException:', [
@@ -97,12 +98,13 @@ class PushProductsCommand extends Command
         $products = Database::getRepo(Product::class)->findByIds($this->entityIds);
 
         foreach ($products as $product) {
-            if ($product->hasVariants()) {
-                $product->setZohoId('has_variants');
-                $records = array_merge($records, $this->getVariants($product));
-            } else {
+            if (!$product->hasVariants()) {
                 $records[] = $this->getProduct($product);
                 $this->entities[] = $product;
+            } else {
+                $product->setZohoSkipped(true);
+                Database::getEM()->persist($product);
+                Database::getEM()->flush();
             }
         }
 
@@ -130,47 +132,5 @@ class PushProductsCommand extends Command
         $record->addFieldValue(Products::Owner(), $owner);
 
         return $record;
-    }
-
-    protected function getVariants(Product $product)
-    {
-        $records = [];
-        $variants = $product->getVariants();
-
-        foreach ($variants as $variant) {
-            $record = new Record();
-
-            $record->addFieldValue(Products::ProductName(), $this->getVariantTitle($variant));
-            $record->addFieldValue(Products::ProductCode(), $variant->getSku());
-            $record->addFieldValue(Products::QtyInStock(), (double) $variant->getAmount());
-            $record->addFieldValue(Products::UnitPrice(), $variant->getPrice());
-            $record->addFieldValue(Products::Tax(), 0);
-            $record->addFieldValue(Products::Description(), Main::getFormattedDescription($product->getBriefDescription()));
-            $record->addFieldValue(Products::ProductActive(), true);
-
-            $category = new Choice("-None-");
-            $record->addFieldValue(Products::ProductCategory(), $category);
-
-            $owner = new MinifiedUser();
-            $owner->setId(Config::getInstance()->Iidev->ZohoCRM->owner_id);
-
-            $record->addFieldValue(Products::Owner(), $owner);
-
-            $records[] = $record;
-
-            $this->entities[] = $variant;
-        }
-
-        return $records;
-    }
-
-    protected function getVariantTitle(\XC\ProductVariants\Model\ProductVariant $model)
-    {
-        $attrsString = array_reduce($model->getValues(), static function ($str, $attr) {
-            $str .= $attr->asString() . ' ';
-            return $str;
-        }, '');
-
-        return $model->getProduct()->getName() . ' ' . trim($attrsString);
     }
 }

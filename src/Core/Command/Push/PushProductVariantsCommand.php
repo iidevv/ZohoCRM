@@ -5,22 +5,22 @@ namespace Iidev\ZohoCRM\Core\Command\Push;
 use Exception;
 use Iidev\ZohoCRM\Core\Command\Command;
 use XLite\Core\Database;
-use XLite\Model\Profile;
+use XC\ProductVariants\Model\ProductVariant;
 use XLite\Core\Config;
 use com\zoho\crm\api\HeaderMap;
 use com\zoho\crm\api\record\RecordOperations;
 use com\zoho\crm\api\record\BodyWrapper;
-use com\zoho\crm\api\record\Contacts;
+use com\zoho\crm\api\record\Products;
 use com\zoho\crm\api\record\Record;
 use com\zoho\crm\api\users\MinifiedUser;
-// use com\zoho\crm\api\util\Choice;
+use com\zoho\crm\api\util\Choice;
 use com\zoho\crm\api\record\ActionWrapper;
 use com\zoho\crm\api\record\SuccessResponse;
 use com\zoho\crm\api\record\APIException;
 use Iidev\ZohoCRM\Core\Data\Converter\Main;
 use XLite\InjectLoggerTrait;
 
-class PushProfilesCommand extends Command
+class PushProductVariantsCommand extends Command
 {
     use InjectLoggerTrait;
 
@@ -37,9 +37,9 @@ class PushProfilesCommand extends Command
     public function execute(): void
     {
         try {
-            $recordOperations = new RecordOperations('Contacts');
+            $recordOperations = new RecordOperations('Products');
             $bodyWrapper = new BodyWrapper();
-            $records = $this->getProfiles();
+            $records = $this->getVariants();
 
             if (empty($records)) {
                 return;
@@ -51,7 +51,7 @@ class PushProfilesCommand extends Command
 
             $this->processResult($response);
         } catch (Exception $e) {
-            $this->getLogger('ZohoCRM')->error('PushProfilesCommand Error:', [
+            $this->getLogger('ZohoCRM')->error('PushProductVariantsCommand Error:', [
                 'message' => $e->getMessage(),
                 'trace' => $e->getTrace(),
             ]);
@@ -68,20 +68,18 @@ class PushProfilesCommand extends Command
                 $index = 0;
                 foreach ($actionResponses as $actionResponse) {
 
-                    $profile = $this->entities[$index];
+                    $product = $this->entities[$index];
 
                     if ($actionResponse instanceof SuccessResponse) {
                         $details = $actionResponse->getDetails();
                         if (isset($details['id'])) {
                             $zohoId = $details['id'];
 
-                            $profile->setZohoId($zohoId);
-                            Database::getEM()->persist($profile);
+                            $product->setZohoId($zohoId);
                         }
                     } else if ($actionResponse instanceof APIException) {
-                        $profile = $this->entities[$index];
                         $this->getLogger('ZohoCRM')->error('APIException:', [
-                            $profile->getLogin(),
+                            $product->getId(),
                             $actionResponse->getDetails(),
                         ]);
                     }
@@ -93,45 +91,53 @@ class PushProfilesCommand extends Command
         }
     }
 
-    protected function getProfiles()
+    protected function getVariants()
     {
         $records = [];
-        $profiles = Database::getRepo(Profile::class)->findByIds($this->entityIds);
+        $variants = Database::getRepo(ProductVariant::class)->findByIds($this->entityIds);
 
-        foreach ($profiles as $profile) {
-            $records[] = $this->getProfile($profile);
-            $this->entities[] = $profile;
+        foreach ($variants as $variant) {
+            $record = $this->getVariant($variant);
+            $records[] = $record;
+
+            $this->entities[] = $variant;
         }
 
         return $records;
     }
 
-    protected function getProfile(Profile $profile)
+    protected function getVariant(ProductVariant $variant)
     {
+        $product = $variant->getProduct();
+
         $record = new Record();
 
-        $record->addFieldValue(Contacts::Email(), $profile->getLogin());
+        $record->addFieldValue(Products::ProductName(), $this->getVariantTitle($variant));
+        $record->addFieldValue(Products::ProductCode(), $variant->getSku());
+        $record->addFieldValue(Products::QtyInStock(), (double) $variant->getAmount());
+        $record->addFieldValue(Products::UnitPrice(), $variant->getPrice());
+        $record->addFieldValue(Products::Tax(), 0);
+        $record->addFieldValue(Products::Description(), Main::getFormattedDescription($product->getBriefDescription()));
+        $record->addFieldValue(Products::ProductActive(), true);
 
-        if (!empty($profile->getBillingAddress())) {
-            $record->addFieldValue(Contacts::FirstName(), $profile->getBillingAddress()->getFirstname());
-            $record->addFieldValue(Contacts::LastName(), $profile->getBillingAddress()->getLastname());
-            $record->addFieldValue(Contacts::Phone(), $profile->getBillingAddress()->getPhone());
-        }
-
-        if (!empty($profile->getShippingAddress())) {
-            $record->addFieldValue(Contacts::MailingCity(), $profile->getShippingAddress()->getCity());
-            $record->addFieldValue(Contacts::MailingCountry(), $profile->getShippingAddress()->getCountryName());
-            $record->addFieldValue(Contacts::MailingState(), $profile->getShippingAddress()->getStateName());
-            $record->addFieldValue(Contacts::MailingStreet(), $profile->getShippingAddress()->getStreet());
-            $record->addFieldValue(Contacts::MailingZip(), $profile->getShippingAddress()->getCity());
-        }
+        $category = new Choice("-None-");
+        $record->addFieldValue(Products::ProductCategory(), $category);
 
         $owner = new MinifiedUser();
         $owner->setId(Config::getInstance()->Iidev->ZohoCRM->owner_id);
 
-        $record->addFieldValue(Contacts::Owner(), $owner);
+        $record->addFieldValue(Products::Owner(), $owner);
 
         return $record;
     }
 
+    protected function getVariantTitle(ProductVariant $model)
+    {
+        $attrsString = array_reduce($model->getValues(), static function ($str, $attr) {
+            $str .= $attr->asString() . ' ';
+            return $str;
+        }, '');
+
+        return $model->getProduct()->getName() . ' ' . trim($attrsString);
+    }
 }
