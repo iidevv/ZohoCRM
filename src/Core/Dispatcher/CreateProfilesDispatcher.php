@@ -14,11 +14,11 @@ class CreateProfilesDispatcher
     
     public function __construct()
     {
-        $profileIds = Database::getRepo(Profile::class)->findProfileIdsToCreateInZoho();
+        $entityIds = Database::getRepo(Profile::class)->findProfileIdsToCreateInZoho();
         
         /** @var PushProfilesCommandFactory $commandFactory */
         $commandFactory = Container::getContainer() ? Container::getContainer()->get('Iidev\ZohoCRM\Core\Factory\Commands\PushProfilesCommandFactory') : null;
-        $command        = $commandFactory->createCommand($profileIds);
+        $command        = $commandFactory->createCommand($entityIds);
         $this->message  = new ExportMessage($command);
     }
 

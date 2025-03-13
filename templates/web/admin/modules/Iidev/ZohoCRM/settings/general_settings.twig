@@ -1,4 +1,8 @@
+<h2>{{ t('Options') }}</h2>
+{{ widget('Iidev\\ZohoCRM\\View\\Model\\Settings') }}
+
 {% if this.isInitialized() %}
+<hr />
     <h2>{{ t('Zoho CRM is initialized') }}</h2>
 {% endif %}
 <hr />

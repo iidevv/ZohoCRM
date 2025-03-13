@@ -2,9 +2,9 @@
 
 namespace Iidev\ZohoCRM\Core\Factory\Commands;
 
-use Iidev\ZohoCRM\Core\Command\Push\UpdateProductsCommand;
+use Iidev\ZohoCRM\Core\Command\Push\PushOrdersCommand;
 
-class UpdateProductsCommandFactory
+class PushOrdersCommandFactory
 {
     public function __construct()
     {
@@ -12,6 +12,6 @@ class UpdateProductsCommandFactory
 
     public function createCommand(array $entityIds)
     {
-        return new UpdateProductsCommand($entityIds);
+        return new PushOrdersCommand($entityIds);
     }
 }

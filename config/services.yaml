@@ -21,10 +21,12 @@ services:
   Iidev\ZohoCRM\Core\Dispatcher\CreateProductsDispatcher: ~
   Iidev\ZohoCRM\Core\Dispatcher\UpdateProductsDispatcher: ~
   Iidev\ZohoCRM\Core\Dispatcher\CreateProfilesDispatcher: ~
+  Iidev\ZohoCRM\Core\Dispatcher\CreateOrdersDispatcher: ~
 
-  Iidev\ZohoCRM\Core\Factory\Commands\PushProductsCommandFactory: 
-  Iidev\ZohoCRM\Core\Factory\Commands\UpdateProductsCommandFactory: 
-  Iidev\ZohoCRM\Core\Factory\Commands\PushProfilesCommandFactory: 
+  Iidev\ZohoCRM\Core\Factory\Commands\PushProductsCommandFactory:
+  Iidev\ZohoCRM\Core\Factory\Commands\UpdateProductsCommandFactory:
+  Iidev\ZohoCRM\Core\Factory\Commands\PushProfilesCommandFactory:
+  Iidev\ZohoCRM\Core\Factory\Commands\PushOrdersCommandFactory:
 
   Iidev\ZohoCRM\Core\Task\CreateProducts:
     tags:
@@ -33,7 +35,7 @@ services:
           event: xcart.cronjob,
           method: handleTask,
         }
-  
+
   Iidev\ZohoCRM\Core\Task\UpdateProducts:
     tags:
       - {
@@ -43,6 +45,14 @@ services:
         }
 
   Iidev\ZohoCRM\Core\Task\CreateProfiles:
+    tags:
+      - {
+          name: kernel.event_listener,
+          event: xcart.cronjob,
+          method: handleTask,
+        }
+
+  Iidev\ZohoCRM\Core\Task\CreateOrders:
     tags:
       - {
           name: kernel.event_listener,
@@ -61,3 +71,7 @@ services:
   Iidev\ZohoCRM\Command\CreateProfilesCommand:
     tags:
       - { name: "console.command", command: "ZohoCRM:CreateProfiles" }
+
+  Iidev\ZohoCRM\Command\CreateOrdersCommand:
+    tags:
+      - { name: "console.command", command: "ZohoCRM:CreateOrders" }

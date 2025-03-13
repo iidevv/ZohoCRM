@@ -1,11 +1,18 @@
 XLite\Model\Config:
   - name: owner_id
     category: Iidev\ZohoCRM
-    type: text
+    type: XLite\View\FormField\Input\Text
     orderby: 100
     translations:
       - code: en
         option_name: "Owner ID"
+  - name: vendor_id
+    category: Iidev\ZohoCRM
+    type: XLite\View\FormField\Input\Text
+    orderby: 150
+    translations:
+      - code: en
+        option_name: "Vendor ID"
   - name: debug_enabled
     category: Iidev\ZohoCRM
     type: XLite\View\FormField\Input\Checkbox\OnOffWithoutOffLabel
@@ -13,3 +20,11 @@ XLite\Model\Config:
     translations:
       - code: en
         option_name: "Enable debugging"
+  - name: orders_from_number
+    category: Iidev\ZohoCRM
+    type: XLite\View\FormField\Input\Text\Integer
+    orderBy: 250
+    value: 0
+    translations:
+      - code: en
+        option_name: "Start sync from order number (0 - no limit)"

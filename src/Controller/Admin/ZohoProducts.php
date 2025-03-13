@@ -12,7 +12,7 @@ class ZohoProducts extends Zoho
     {
         $dispatcher = new CreateProductsDispatcher();
         $message    = $dispatcher->getMessage();
-
+        
         $this->bus->dispatch($message);
 
         $this->setReturnURL(Converter::buildURL(\Iidev\ZohoCRM\View\Tabs\Zoho::TAB_PRODUCTS));

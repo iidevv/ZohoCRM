@@ -4,8 +4,7 @@ authorName: "Ilya I"
 moduleName: "ZohoCRM"
 description: "Zoho CRM integration."
 minorRequiredCoreVersion: 0
-dependsOn:
-    -XC-ProductVariants
+dependsOn: {}
 incompatibleWith: {}
 showSettingsForm: true
 canDisable: true

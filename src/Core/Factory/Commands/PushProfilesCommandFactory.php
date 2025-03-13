@@ -10,8 +10,8 @@ class PushProfilesCommandFactory
     {
     }
 
-    public function createCommand(array $productsIds)
+    public function createCommand(array $entityIds)
     {
-        return new PushProfilesCommand($productsIds);
+        return new PushProfilesCommand($entityIds);
     }
 }

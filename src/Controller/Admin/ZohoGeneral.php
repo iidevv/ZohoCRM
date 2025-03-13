@@ -8,6 +8,12 @@ use Iidev\ZohoCRM\Core\SDK\SDK;
 
 class ZohoGeneral extends Zoho
 {
+    const OPTIONS = [
+        'owner_id',
+        'vendor_id',
+        'debug_enabled',
+    ];
+
     protected function doActionInitialize()
     {
         $data = Request::getInstance()->getData();

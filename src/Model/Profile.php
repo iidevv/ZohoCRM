@@ -17,12 +17,12 @@ class Profile extends \XLite\Model\Profile
      */
     protected $zoho_id;
 
-    public function getZohoId(): string
+    public function getZohoId()
     {
         return $this->zoho_id;
     }
 
-    public function setZohoId(string $zoho_id): self
+    public function setZohoId($zoho_id): self
     {
         $this->zoho_id = $zoho_id;
 

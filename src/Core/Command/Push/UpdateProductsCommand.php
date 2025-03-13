@@ -19,14 +19,14 @@ class UpdateProductsCommand extends Command
 {
     use InjectLoggerTrait;
 
-    private array $productIds;
+    private array $entityIds;
     private array $products = [];
 
     public function __construct(
-        array $productIds
+        array $entityIds
     ) {
         parent::__construct();
-        $this->productIds = $productIds;
+        $this->entityIds = $entityIds;
     }
 
     public function execute(): void
@@ -48,7 +48,7 @@ class UpdateProductsCommand extends Command
         } catch (Exception $e) {
             $this->getLogger('ZohoCRM')->error('UpdateProductsCommand Error:', [
                 'message' => $e->getMessage(),
-                'trace' => $e->getTraceAsString(),
+                'trace' => $e->getTrace(),
             ]);
         }
     }
@@ -83,7 +83,7 @@ class UpdateProductsCommand extends Command
     protected function getProducts()
     {
         $records = [];
-        $this->products = Database::getRepo(Product::class)->findByIds($this->productIds);
+        $this->products = Database::getRepo(Product::class)->findByIds($this->entityIds);
 
         foreach ($this->products as $product) {
             if ($product->hasVariants()) {

@@ -14,11 +14,11 @@ class UpdateProductsDispatcher
     
     public function __construct()
     {
-        $productsIds = Database::getRepo(Product::class)->findProductIdsToSyncInZoho();
+        $entityIds = Database::getRepo(Product::class)->findProductIdsToSyncInZoho();
 
         /** @var UpdateProductsCommandFactory $commandFactory */
         $commandFactory = Container::getContainer() ? Container::getContainer()->get('Iidev\ZohoCRM\Core\Factory\Commands\UpdateProductsCommandFactory') : null;
-        $command        = $commandFactory->createCommand($productsIds);
+        $command        = $commandFactory->createCommand($entityIds);
         $this->message  = new ExportMessage($command);
     }
 

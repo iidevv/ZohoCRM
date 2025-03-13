@@ -8,6 +8,7 @@ use Exception;
 use com\zoho\api\authenticator\OAuthBuilder;
 use com\zoho\api\authenticator\store\FileStore;
 use com\zoho\crm\api\InitializeBuilder;
+use com\zoho\crm\api\SDKConfigBuilder;
 use com\zoho\crm\api\dc\USDataCenter;
 use com\zoho\api\logger\LogBuilder;
 use com\zoho\api\logger\Levels;
@@ -64,9 +65,23 @@ class SDK
             ->filePath("../zoho_sdk_log.log")
             ->build();
 
+        $autoRefreshFields = false;
+        $pickListValidation = false;
+        $connectionTimeout = 2; //The number of seconds to wait while trying to connect. Use 0 to wait indefinitely.
+        $timeout = 2; //The maximum number of seconds to allow cURL functions to execute.
+        $enableSSLVerification = false;
+        $sdkConfig = (new SDKConfigBuilder())
+            ->autoRefreshFields($autoRefreshFields)
+            ->pickListValidation($pickListValidation)
+            ->sslVerification($enableSSLVerification)
+            ->connectionTimeout($connectionTimeout)
+            ->timeout($timeout)
+            ->build();
+
         (new InitializeBuilder())
             ->environment($environment)
             ->store($tokenstore)
+            ->SDKConfig($sdkConfig)
             ->token($token)
             ->logger($logger)
             ->initialize();

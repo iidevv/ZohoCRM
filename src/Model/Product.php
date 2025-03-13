@@ -23,12 +23,12 @@ class Product extends \XLite\Model\Product
      */
     protected $zoho_last_synced = 0;
 
-    public function getZohoId(): string
+    public function getZohoId()
     {
         return $this->zoho_id;
     }
 
-    public function setZohoId(string $zoho_id): self
+    public function setZohoId($zoho_id): self
     {
         $this->zoho_id = $zoho_id;
 
@@ -40,7 +40,7 @@ class Product extends \XLite\Model\Product
         return $this->zoho_last_synced;
     }
 
-    public function setZohoLastSynced(string $zoho_last_synced): self
+    public function setZohoLastSynced($zoho_last_synced): self
     {
         $this->zoho_last_synced = $zoho_last_synced;
 

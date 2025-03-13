@@ -24,14 +24,14 @@ class PushProfilesCommand extends Command
 {
     use InjectLoggerTrait;
 
-    private array $profileIds;
+    private array $entityIds;
     private array $entities = [];
 
     public function __construct(
-        array $profileIds
+        array $entityIds
     ) {
         parent::__construct();
-        $this->profileIds = $profileIds;
+        $this->entityIds = $entityIds;
     }
 
     public function execute(): void
@@ -53,7 +53,7 @@ class PushProfilesCommand extends Command
         } catch (Exception $e) {
             $this->getLogger('ZohoCRM')->error('PushProfilesCommand Error:', [
                 'message' => $e->getMessage(),
-                'trace' => $e->getTraceAsString(),
+                'trace' => $e->getTrace(),
             ]);
         }
     }
@@ -95,7 +95,7 @@ class PushProfilesCommand extends Command
     protected function getProfiles()
     {
         $records = [];
-        $profiles = Database::getRepo(Profile::class)->findByIds($this->profileIds);
+        $profiles = Database::getRepo(Profile::class)->findByIds($this->entityIds);
 
         foreach ($profiles as $profile) {
             $records[] = $this->getProfile($profile);
