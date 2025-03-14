@@ -10,7 +10,7 @@ class ZohoGeneral extends Zoho
 {
     const OPTIONS = [
         'owner_id',
-        'vendor_id',
+        'deleted_product_id',
         'debug_enabled',
     ];
 

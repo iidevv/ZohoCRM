@@ -16,6 +16,10 @@ class CreateProfilesDispatcher
     {
         $entityIds = Database::getRepo(Profile::class)->findProfileIdsToCreateInZoho();
         
+        if (empty($entityIds)) {
+            return;
+        }
+
         /** @var PushProfilesCommandFactory $commandFactory */
         $commandFactory = Container::getContainer() ? Container::getContainer()->get('Iidev\ZohoCRM\Core\Factory\Commands\PushProfilesCommandFactory') : null;
         $command        = $commandFactory->createCommand($entityIds);

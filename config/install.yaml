@@ -6,13 +6,14 @@ XLite\Model\Config:
     translations:
       - code: en
         option_name: "Owner ID"
-  - name: vendor_id
+  - name: deleted_product_id
     category: Iidev\ZohoCRM
     type: XLite\View\FormField\Input\Text
     orderby: 150
     translations:
       - code: en
-        option_name: "Vendor ID"
+        option_name: "Deleted Product Placeholder ID"
+        option_comment: 'This is a placeholder product used when an item in an order has been deleted from the shopping cart. It ensures the order can be processed without missing line items.'
   - name: debug_enabled
     category: Iidev\ZohoCRM
     type: XLite\View\FormField\Input\Checkbox\OnOffWithoutOffLabel

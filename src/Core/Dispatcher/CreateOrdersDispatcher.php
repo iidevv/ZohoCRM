@@ -21,6 +21,10 @@ class CreateOrdersDispatcher
     {
         $entityIds = Database::getRepo(Order::class)->findOrderIdsToCreateInZoho();
 
+        if (empty($entityIds)) {
+            return;
+        }
+
         $this->orders = Database::getRepo(Order::class)->findByIds($entityIds);
         $this->createProfilesAndProductsBeforePushOrders();
 
@@ -49,9 +53,18 @@ class CreateOrdersDispatcher
             foreach ($order->getItems() as $orderItem) {
                 if ($orderItem->getVariant() && !$orderItem->getVariant()->getZohoId()) {
                     $productVariantIds[] = $orderItem->getVariant()->getId();
+                    continue;
                 }
-                if ($orderItem->getProduct() && !$orderItem->getProduct()->getZohoId()) {
+                if ($orderItem->getProduct()->getProductId() && !$orderItem->getProduct()->getZohoId()) {
                     $productIds[] = $orderItem->getProduct()->getProductId();
+                    continue;
+                }
+
+                $main = new \Iidev\ZohoCRM\Main();
+                $product = $main->getDeletedProductPlaceholder();
+
+                if ($product && !$product->getZohoId()) {
+                    $productIds[] = $product->getProductId();
                 }
             }
         }

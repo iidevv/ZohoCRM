@@ -18,7 +18,7 @@ class Order extends \XLite\Model\Repo\Order
         $qb = $this->createQueryBuilder('o')
             ->andWhere('o.zoho_id IS NULL')
             ->select('o.order_id')
-            ->setMaxResults(30);
+            ->setMaxResults(1);
 
         if ($createOrdersFrom > 0) {
             $qb->andWhere('o.orderNumber >= :orderNumber')
