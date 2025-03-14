@@ -195,7 +195,7 @@ class PushOrdersCommand extends Command
         $record = new Record();
         $record->addFieldValue(Products::ProductName(), $lineItemProduct);
 
-        $record->addFieldValue(new Field('List_Price'), (double) $orderItem->getPrice());
+        $record->addFieldValue(new Field('List_Price'), (double) $orderItem->getTotal() / $orderItem->getAmount());
         $record->addFieldValue(new Field('Quantity'), (double) $orderItem->getAmount());
 
         return $record;
