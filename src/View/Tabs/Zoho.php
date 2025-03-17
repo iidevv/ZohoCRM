@@ -18,7 +18,7 @@ class Zoho extends ATabs
 {
     const TAB_GENERAL          = 'zoho_general';
     const TAB_PRODUCTS          = 'zoho_products';
-    const TAB_USERS          = 'zoho_users';
+    const TAB_PROFILES          = 'zoho_profiles';
     const TAB_ORDERS          = 'zoho_orders';
 
     /**
@@ -31,7 +31,7 @@ class Zoho extends ATabs
             [
                 static::TAB_GENERAL,
                 static::TAB_PRODUCTS,
-                static::TAB_USERS,
+                static::TAB_PROFILES,
                 static::TAB_ORDERS
             ]
         );
@@ -53,10 +53,10 @@ class Zoho extends ATabs
                 'title'  => static::t('Products'),
                 'widget' => Settings\Products::class,
             ],
-            static::TAB_USERS        => [
+            static::TAB_PROFILES        => [
                 'weight' => 200,
-                'title'  => static::t('Users'),
-                'widget' => Settings\Users::class,
+                'title'  => static::t('Profiles'),
+                'widget' => Settings\Profiles::class,
             ],
             static::TAB_ORDERS         => [
                 'weight' => 200,

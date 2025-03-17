@@ -18,7 +18,7 @@ abstract class ASettings extends \XLite\View\AView
             [
                 Zoho::TAB_GENERAL,
                 Zoho::TAB_PRODUCTS,
-                Zoho::TAB_USERS,
+                Zoho::TAB_PROFILES,
                 Zoho::TAB_ORDERS
             ]
         );

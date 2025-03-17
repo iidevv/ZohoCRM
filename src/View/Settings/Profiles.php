@@ -2,7 +2,7 @@
 
 namespace Iidev\ZohoCRM\View\Settings;
 
-class Users extends ASettings
+class Profiles extends ASettings
 {
     /**
      * Return widget default template
@@ -11,7 +11,7 @@ class Users extends ASettings
      */
     protected function getDefaultTemplate()
     {
-        return $this->getDir() . '/users.twig';
+        return $this->getDir() . '/profiles.twig';
     }
 
     /**
