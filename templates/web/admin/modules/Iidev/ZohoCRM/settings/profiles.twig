@@ -1,4 +1,7 @@
 <h2>Manual Sync</h2>
-<ul class="list">
+<ul class="action-list">
   <li>{{ widget('XLite\\View\\Button\\Link', location=xurl('zoho_profiles', 'create_zoho_profiles'), label=t('Create profiles')) }}</li>
 </ul>
+<hr>
+<h2>Profile errors</h2>
+{{ widget('Iidev\\ZohoCRM\\View\\ItemsList\\Model\\Profile') }}

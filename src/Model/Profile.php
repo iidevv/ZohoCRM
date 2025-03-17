@@ -36,4 +36,27 @@ class Profile extends \XLite\Model\Profile implements ZohoAwareInterface
         $this->zohoModel = $zohoModel;
         return $this;
     }
+
+    /**
+     * @return array|null
+     */
+    public function getDecodedZohoErrors()
+    {
+        if ($this->zohoModel && $this->zohoModel->getErrors()) {
+            return json_decode($this->zohoModel->getErrors(), true) ?: [];
+        }
+        return null;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isSkipped()
+    {
+        if ($this->zohoModel) {
+            return $this->zohoModel->getSkipped();
+        }
+
+        return true;
+    }
 }
