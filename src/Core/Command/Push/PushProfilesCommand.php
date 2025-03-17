@@ -13,20 +13,9 @@ use com\zoho\crm\api\record\BodyWrapper;
 use com\zoho\crm\api\record\Contacts;
 use com\zoho\crm\api\record\Record;
 use com\zoho\crm\api\users\MinifiedUser;
-// use com\zoho\crm\api\util\Choice;
-use com\zoho\crm\api\record\ActionWrapper;
-use com\zoho\crm\api\record\SuccessResponse;
-use com\zoho\crm\api\record\APIException;
-use Iidev\ZohoCRM\Core\Data\Converter\Main;
-use XLite\InjectLoggerTrait;
 
 class PushProfilesCommand extends Command
 {
-    use InjectLoggerTrait;
-
-    private array $entityIds;
-    private array $entities = [];
-
     public function __construct(
         array $entityIds
     ) {
@@ -49,47 +38,12 @@ class PushProfilesCommand extends Command
             $headerInstance = new HeaderMap();
             $response = $recordOperations->createRecords($bodyWrapper, $headerInstance);
 
-            $this->processResult($response);
+            $this->processResult(\Iidev\ZohoCRM\Model\ZohoProfile::class, $response);
         } catch (Exception $e) {
             $this->getLogger('ZohoCRM')->error('PushProfilesCommand Error:', [
                 'message' => $e->getMessage(),
                 'trace' => $e->getTrace(),
             ]);
-        }
-    }
-
-    protected function processResult($response)
-    {
-        if ($response != null) {
-            $actionHandler = $response->getObject();
-            if ($actionHandler instanceof ActionWrapper) {
-                $actionResponses = $actionHandler->getData();
-
-                $index = 0;
-                foreach ($actionResponses as $actionResponse) {
-
-                    $profile = $this->entities[$index];
-
-                    if ($actionResponse instanceof SuccessResponse) {
-                        $details = $actionResponse->getDetails();
-                        if (isset($details['id'])) {
-                            $zohoId = $details['id'];
-
-                            $profile->setZohoId($zohoId);
-                            Database::getEM()->persist($profile);
-                        }
-                    } else if ($actionResponse instanceof APIException) {
-                        $profile = $this->entities[$index];
-                        $this->getLogger('ZohoCRM')->error('APIException:', [
-                            $profile->getLogin(),
-                            $actionResponse->getDetails(),
-                        ]);
-                    }
-                    $index++;
-                }
-
-                Database::getEM()->flush();
-            }
         }
     }
 
@@ -133,5 +87,4 @@ class PushProfilesCommand extends Command
 
         return $record;
     }
-
 }
