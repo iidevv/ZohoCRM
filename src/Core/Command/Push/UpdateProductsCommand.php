@@ -11,17 +11,9 @@ use com\zoho\crm\api\record\RecordOperations;
 use com\zoho\crm\api\record\BodyWrapper;
 use com\zoho\crm\api\record\Products;
 use com\zoho\crm\api\record\Record;
-use com\zoho\crm\api\record\ActionWrapper;
-use com\zoho\crm\api\record\APIException;
-use XLite\InjectLoggerTrait;
 
 class UpdateProductsCommand extends Command
 {
-    use InjectLoggerTrait;
-
-    private array $entityIds;
-    private array $products = [];
-
     public function __construct(
         array $entityIds
     ) {
@@ -44,7 +36,7 @@ class UpdateProductsCommand extends Command
             $headerInstance = new HeaderMap();
             $response = $recordOperations->updateRecords($bodyWrapper, $headerInstance);
 
-            $this->processResult($response);
+            $this->processUpdateResult($response);
         } catch (Exception $e) {
             $this->getLogger('ZohoCRM')->error('UpdateProductsCommand Error:', [
                 'message' => $e->getMessage(),
@@ -53,39 +45,12 @@ class UpdateProductsCommand extends Command
         }
     }
 
-    protected function processResult($response)
-    {
-        if ($response != null) {
-            $actionHandler = $response->getObject();
-            if ($actionHandler instanceof ActionWrapper) {
-                $actionResponses = $actionHandler->getData();
-
-                foreach ($actionResponses as $actionResponse) {
-                    if ($actionResponse instanceof APIException) {
-                        $this->getLogger('ZohoCRM')->error('APIException:', [
-                            $actionResponse->getStatus(),
-                            $actionResponse->getCode(),
-                            $actionResponse->getDetails(),
-                        ]);
-                    }
-
-                    foreach ($this->products as $product) {
-                        $product->setZohoLastSynced(time());
-                        Database::getEM()->persist($product);
-                    }
-
-                    Database::getEM()->flush();
-                }
-            }
-        }
-    }
-
     protected function getProducts()
     {
         $records = [];
-        $this->products = Database::getRepo(Product::class)->findByIds($this->entityIds);
+        $this->entities = Database::getRepo(Product::class)->findByIds($this->entityIds);
 
-        foreach ($this->products as $product) {
+        foreach ($this->entities as $product) {
             if ($product->hasVariants()) {
                 $records = array_merge($records, $this->getVariants($product));
             } else {

@@ -5,27 +5,58 @@ namespace Iidev\ZohoCRM\Model;
 use Doctrine\ORM\Mapping as ORM;
 
 use XCart\Extender\Mapping\Extender;
+use Iidev\ZohoCRM\Core\ZohoAwareInterface;
 
 /**
  * @Extender\Mixin
  */
-class Order extends \XLite\Model\Order
+class Order extends \XLite\Model\Order implements ZohoAwareInterface
 {
     /**
-     * @var string
-     * @ORM\Column (type="string", nullable=true)
+     * @var \Iidev\ZohoCRM\Model\ZohoOrder
+     *
+     * @ORM\OneToOne(targetEntity="Iidev\ZohoCRM\Model\ZohoOrder", mappedBy="order_id", cascade={"merge", "detach", "persist"})
      */
-    protected $zoho_id;
+    protected $zohoModel;
 
-    public function getZohoId()
+    /**
+     * @return \Iidev\ZohoCRM\Model\ZohoOrder|null
+     */
+    public function getZohoModel()
     {
-        return $this->zoho_id;
+        return $this->zohoModel;
     }
 
-    public function setZohoId($zoho_id): self
+    /**
+     * @param \Iidev\ZohoCRM\Model\ZohoOrder|null $zohoModel
+     * @return self
+     */
+    public function setZohoModel($zohoModel): self
     {
-        $this->zoho_id = $zoho_id;
-
+        $this->zohoModel = $zohoModel;
         return $this;
+    }
+
+    /**
+     * @return array|null
+     */
+    public function getDecodedZohoErrors()
+    {
+        if ($this->zohoModel && $this->zohoModel->getErrors()) {
+            return json_decode($this->zohoModel->getErrors(), true) ?: [];
+        }
+        return null;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isSkipped()
+    {
+        if ($this->zohoModel) {
+            return $this->zohoModel->getSkipped();
+        }
+
+        return true;
     }
 }

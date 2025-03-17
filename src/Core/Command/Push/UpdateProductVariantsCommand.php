@@ -11,17 +11,9 @@ use com\zoho\crm\api\record\RecordOperations;
 use com\zoho\crm\api\record\BodyWrapper;
 use com\zoho\crm\api\record\Products;
 use com\zoho\crm\api\record\Record;
-use com\zoho\crm\api\record\ActionWrapper;
-use com\zoho\crm\api\record\APIException;
-use XLite\InjectLoggerTrait;
 
 class UpdateProductVariantsCommand extends Command
 {
-    use InjectLoggerTrait;
-
-    private array $entityIds;
-    private array $variants = [];
-
     public function __construct(
         array $entityIds
     ) {
@@ -44,7 +36,7 @@ class UpdateProductVariantsCommand extends Command
             $headerInstance = new HeaderMap();
             $response = $recordOperations->updateRecords($bodyWrapper, $headerInstance);
 
-            $this->processResult($response);
+            $this->processUpdateResult($response);
         } catch (Exception $e) {
             $this->getLogger('ZohoCRM')->error('UpdateProductVariantsCommand Error:', [
                 'message' => $e->getMessage(),
@@ -53,39 +45,12 @@ class UpdateProductVariantsCommand extends Command
         }
     }
 
-    protected function processResult($response)
-    {
-        if ($response != null) {
-            $actionHandler = $response->getObject();
-            if ($actionHandler instanceof ActionWrapper) {
-                $actionResponses = $actionHandler->getData();
-
-                foreach ($actionResponses as $actionResponse) {
-                    if ($actionResponse instanceof APIException) {
-                        $this->getLogger('ZohoCRM')->error('APIException:', [
-                            $actionResponse->getStatus(),
-                            $actionResponse->getCode(),
-                            $actionResponse->getDetails(),
-                        ]);
-                    }
-
-                    foreach ($this->variants as $variant) {
-                        $variant->setZohoLastSynced(time());
-                        Database::getEM()->persist($variant);
-                    }
-
-                    Database::getEM()->flush();
-                }
-            }
-        }
-    }
-
     protected function getVariants()
     {
         $records = [];
-        $this->variants = Database::getRepo(ProductVariant::class)->findByIds($this->entityIds);
+        $this->entities = Database::getRepo(ProductVariant::class)->findByIds($this->entityIds);
 
-        foreach ($this->variants as $variant) {
+        foreach ($this->entities as $variant) {
             $record = $this->getVariant($variant);
             $records[] = $record;
         }

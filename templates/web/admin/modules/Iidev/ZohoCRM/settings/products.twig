@@ -3,3 +3,6 @@
   <li>{{ widget('XLite\\View\\Button\\Link', location=xurl('zoho_products', 'create_zoho_products'), label=t('Create products')) }}</li>
   <li>{{ widget('XLite\\View\\Button\\Link', location=xurl('zoho_products', 'update_zoho_products'), label=t('Update products')) }}</li>
 </ul>
+<hr>
+<h2>Product errors</h2>
+{{ widget('Iidev\\ZohoCRM\\View\\ItemsList\\Model\\Product') }}

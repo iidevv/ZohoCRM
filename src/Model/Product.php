@@ -5,63 +5,58 @@ namespace Iidev\ZohoCRM\Model;
 use Doctrine\ORM\Mapping as ORM;
 
 use XCart\Extender\Mapping\Extender;
+use Iidev\ZohoCRM\Core\ZohoAwareInterface;
 
 /**
  * @Extender\Mixin
  */
-class Product extends \XLite\Model\Product
+class Product extends \XLite\Model\Product implements ZohoAwareInterface
 {
     /**
-     * @var string
-     * @ORM\Column (type="string", nullable=true)
+     * @var \Iidev\ZohoCRM\Model\ZohoProduct
+     *
+     * @ORM\OneToOne(targetEntity="Iidev\ZohoCRM\Model\ZohoProduct", mappedBy="product_id", cascade={"merge", "detach", "persist"})
      */
-    protected $zoho_id;
+    protected $zohoModel;
 
     /**
-     * @var string
-     * @ORM\Column (type="integer", options={ "unsigned": true })
+     * @return \Iidev\ZohoCRM\Model\ZohoProduct|null
      */
-    protected $zoho_last_synced = 0;
+    public function getZohoModel()
+    {
+        return $this->zohoModel;
+    }
 
     /**
-     * @var boolean
-     * @ORM\Column (type="boolean")
+     * @param \Iidev\ZohoCRM\Model\ZohoProduct|null $zohoModel
+     * @return self
      */
-    protected $zoho_skipped = false;
-
-    public function getZohoId()
+    public function setZohoModel($zohoModel): self
     {
-        return $this->zoho_id;
-    }
-
-    public function setZohoId($zoho_id): self
-    {
-        $this->zoho_id = $zoho_id;
-
+        $this->zohoModel = $zohoModel;
         return $this;
     }
 
-    public function getZohoLastSynced()
+    /**
+     * @return array|null
+     */
+    public function getDecodedZohoErrors()
     {
-        return $this->zoho_last_synced;
+        if ($this->zohoModel && $this->zohoModel->getErrors()) {
+            return json_decode($this->zohoModel->getErrors(), true) ?: [];
+        }
+        return null;
     }
 
-    public function setZohoLastSynced($zoho_last_synced): self
+    /**
+     * @return bool
+     */
+    public function isSkipped()
     {
-        $this->zoho_last_synced = $zoho_last_synced;
+        if ($this->zohoModel) {
+            return $this->zohoModel->getSkipped();
+        }
 
-        return $this;
-    }
-
-    public function getZohoSkipped()
-    {
-        return $this->zoho_skipped;
-    }
-
-    public function setZohoSkipped($zoho_skipped): self
-    {
-        $this->zoho_skipped = $zoho_skipped;
-
-        return $this;
+        return true;
     }
 }

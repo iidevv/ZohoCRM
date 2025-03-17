@@ -5,46 +5,58 @@ namespace Iidev\ZohoCRM\Model;
 use Doctrine\ORM\Mapping as ORM;
 
 use XCart\Extender\Mapping\Extender;
+use Iidev\ZohoCRM\Core\ZohoAwareInterface;
 
 /**
  * @Extender\Mixin
  */
-class ProductVariant extends \XC\ProductVariants\Model\ProductVariant
+class ProductVariant extends \XC\ProductVariants\Model\ProductVariant implements ZohoAwareInterface
 {
     /**
+     * @var \Iidev\ZohoCRM\Model\ZohoProductVariant
      *
-     * @var string
-     * @ORM\Column (type="string", nullable=true)
+     * @ORM\OneToOne(targetEntity="Iidev\ZohoCRM\Model\ZohoProductVariant", mappedBy="id", cascade={"merge", "detach", "persist"})
      */
-    protected $zoho_id;
+    protected $zohoModel;
 
     /**
-     * @var string
-     * @ORM\Column (type="integer", options={ "unsigned": true })
+     * @return \Iidev\ZohoCRM\Model\ZohoProductVariant|null
      */
-    protected $zoho_last_synced = 0;
-
-    public function getZohoId()
+    public function getZohoModel()
     {
-        return $this->zoho_id;
+        return $this->zohoModel;
     }
 
-    public function setZohoId($zoho_id): self
+    /**
+     * @param \Iidev\ZohoCRM\Model\ZohoProductVariant|null $zohoModel
+     * @return self
+     */
+    public function setZohoModel($zohoModel): self
     {
-        $this->zoho_id = $zoho_id;
-
+        $this->zohoModel = $zohoModel;
         return $this;
     }
 
-    public function getZohoLastSynced()
+    /**
+     * @return array|null
+     */
+    public function getDecodedZohoErrors()
     {
-        return $this->zoho_last_synced;
+        if ($this->zohoModel && $this->zohoModel->getErrors()) {
+            return json_decode($this->zohoModel->getErrors(), true) ?: [];
+        }
+        return null;
     }
 
-    public function setZohoLastSynced($zoho_last_synced): self
+    /**
+     * @return bool
+     */
+    public function isSkipped()
     {
-        $this->zoho_last_synced = $zoho_last_synced;
+        if ($this->zohoModel) {
+            return $this->zohoModel->getSkipped();
+        }
 
-        return $this;
+        return true;
     }
 }

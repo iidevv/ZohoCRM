@@ -9,12 +9,29 @@ use XCart\Extender\Mapping\Extender;
  */
 class ProductVariant extends \XC\ProductVariants\Model\Repo\ProductVariant
 {
+    public const SEARCH_ZOHO_PRODUCT_VARIANTS = 'zoho_product_variants';
+
+    /**
+     *
+     * @param \Doctrine\ORM\QueryBuilder $queryBuilder QueryBuilder instance
+     * @param mixed                      $value        Searchable value
+     *
+     * @return void
+     */
+    protected function prepareCndZohoProductVariants(\Doctrine\ORM\QueryBuilder $queryBuilder, $value)
+    {
+        $queryBuilder
+            ->leftJoin('v.zohoModel', 'zm')
+            ->andWhere('zm.id IS NOT NULL')
+            ->andWhere('zm.errors != :emptyString')
+            ->setParameter('emptyString', '');
+    }
+
     public function findVariantIdsToCreateInZoho()
     {
         return $this->createQueryBuilder('v')
-            ->where('v.enabled = :enabled')
-            ->andWhere('v.zoho_id IS NULL')
-            ->setParameter('enabled', 1)
+            ->leftJoin('v.zohoModel', 'zm')
+            ->where('zm.zoho_id IS NULL')
             ->select('v.id')
             ->setMaxResults(30)
             ->getQuery()->getSingleColumnResult();
@@ -23,12 +40,11 @@ class ProductVariant extends \XC\ProductVariants\Model\Repo\ProductVariant
     public function findVariantIdsToSyncInZoho()
     {
         return $this->createQueryBuilder('v')
-            ->where('v.enabled = :enabled')
-            ->andWhere('v.zoho_id IS NOT NULL')
-            ->andWhere('v.zoho_last_synced < :timeLimit')
-            ->setParameter('enabled', 1)
+            ->leftJoin('v.zohoModel', 'zm')
+            ->where('zm.zoho_id IS NOT NULL')
+            ->andWhere('zm.last_synced < :timeLimit')
             ->setParameter('timeLimit', time() - 3600)
-            ->orderBy('v.zoho_last_synced', 'DESC')
+            ->orderBy('zm.last_synced', 'DESC')
             ->select('v.id')
             ->setMaxResults(30)
             ->getQuery()->getSingleColumnResult();

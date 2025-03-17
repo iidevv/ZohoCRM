@@ -76,4 +76,32 @@ class Command implements ICommand
             }
         }
     }
+
+    protected function processUpdateResult($response)
+    {
+        if ($response != null) {
+            $actionHandler = $response->getObject();
+            if ($actionHandler instanceof ActionWrapper) {
+                $actionResponses = $actionHandler->getData();
+
+                foreach ($actionResponses as $actionResponse) {
+                    if ($actionResponse instanceof APIException) {
+                        $this->getLogger('ZohoCRM')->error('processUpdateResult APIException:', [
+                            $actionResponse->getStatus(),
+                            $actionResponse->getCode(),
+                            $actionResponse->getDetails(),
+                        ]);
+                    }
+                }
+
+                foreach ($this->entities as $entity) {
+                    $zohoModel = $entity->getZohoModel();
+                    $zohoModel->setLastSynced(time());
+                    Database::getEM()->persist($zohoModel);
+                }
+
+                Database::getEM()->flush();
+            }
+        }
+    }
 }

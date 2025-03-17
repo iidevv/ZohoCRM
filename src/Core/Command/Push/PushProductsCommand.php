@@ -14,19 +14,10 @@ use com\zoho\crm\api\record\Products;
 use com\zoho\crm\api\record\Record;
 use com\zoho\crm\api\users\MinifiedUser;
 use com\zoho\crm\api\util\Choice;
-use com\zoho\crm\api\record\ActionWrapper;
-use com\zoho\crm\api\record\SuccessResponse;
-use com\zoho\crm\api\record\APIException;
 use Iidev\ZohoCRM\Core\Data\Converter\Main;
-use XLite\InjectLoggerTrait;
 
 class PushProductsCommand extends Command
 {
-    use InjectLoggerTrait;
-
-    private array $entityIds;
-    private array $entities = [];
-
     public function __construct(
         array $entityIds
     ) {
@@ -49,46 +40,12 @@ class PushProductsCommand extends Command
             $headerInstance = new HeaderMap();
             $response = $recordOperations->createRecords($bodyWrapper, $headerInstance);
 
-            $this->processResult($response);
+            $this->processCreateResult(\Iidev\ZohoCRM\Model\ZohoProduct::class, $response);
         } catch (Exception $e) {
             $this->getLogger('ZohoCRM')->error('PushProductsCommand Error:', [
                 'message' => $e->getMessage(),
                 'trace' => $e->getTrace(),
             ]);
-        }
-    }
-
-    protected function processResult($response)
-    {
-        if ($response != null) {
-            $actionHandler = $response->getObject();
-            if ($actionHandler instanceof ActionWrapper) {
-                $actionResponses = $actionHandler->getData();
-
-                $index = 0;
-                foreach ($actionResponses as $actionResponse) {
-
-                    $product = $this->entities[$index];
-
-                    if ($actionResponse instanceof SuccessResponse) {
-                        $details = $actionResponse->getDetails();
-                        if (isset($details['id'])) {
-                            $zohoId = $details['id'];
-
-                            $product->setZohoId($zohoId);
-                            Database::getEM()->persist($product);
-                        }
-                    } else if ($actionResponse instanceof APIException) {
-                        $this->getLogger('ZohoCRM')->error('APIException:', [
-                            $product->getId(),
-                            $actionResponse->getDetails(),
-                        ]);
-                    }
-                    $index++;
-                }
-
-                Database::getEM()->flush();
-            }
         }
     }
 
@@ -102,13 +59,27 @@ class PushProductsCommand extends Command
                 $records[] = $this->getProduct($product);
                 $this->entities[] = $product;
             } else {
-                $product->setZohoSkipped(true);
+                $this->setSkipProduct($product);
+
                 Database::getEM()->persist($product);
                 Database::getEM()->flush();
             }
         }
 
         return $records;
+    }
+
+    protected function setSkipProduct($product)
+    {
+        $zohoModel = $product->getZohoModel();
+        if (!$zohoModel) {
+            $zohoModel = new \Iidev\ZohoCRM\Model\ZohoProduct();
+            $zohoModel->setId($product);
+            $zohoModel->setSkipped(true);
+            $product->setZohoModel($zohoModel);
+        } else {
+            $zohoModel->setSkipped(true);
+        }
     }
 
     protected function getProduct(Product $product)

@@ -28,7 +28,7 @@ services:
   Iidev\ZohoCRM\Core\Factory\Commands\PushProductsCommandFactory:
   Iidev\ZohoCRM\Core\Factory\Commands\PushProductVariantsCommandFactory:
   Iidev\ZohoCRM\Core\Factory\Commands\UpdateProductsCommandFactory:
-  Iidev\ZohoCRM\Core\Factory\Commands\UpdateVariantsCommandFactory:
+  Iidev\ZohoCRM\Core\Factory\Commands\UpdateProductVariantsCommandFactory:
   Iidev\ZohoCRM\Core\Factory\Commands\PushProfilesCommandFactory:
   Iidev\ZohoCRM\Core\Factory\Commands\PushOrdersCommandFactory:
 

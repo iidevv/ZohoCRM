@@ -15,22 +15,13 @@ use com\zoho\crm\api\record\LineItemProduct;
 use com\zoho\crm\api\record\Products;
 use com\zoho\crm\api\record\Record;
 use com\zoho\crm\api\users\MinifiedUser;
-use com\zoho\crm\api\record\ActionWrapper;
-use com\zoho\crm\api\record\SuccessResponse;
-use com\zoho\crm\api\record\APIException;
 use com\zoho\crm\api\record\Field;
 use com\zoho\crm\api\util\Choice;
 use XLite\Model\Base\Surcharge;
 use \XLite\Model\OrderItem;
-use XLite\InjectLoggerTrait;
 
 class PushOrdersCommand extends Command
 {
-    use InjectLoggerTrait;
-
-    private array $entityIds;
-    private array $entities = [];
-
     public function __construct(
         array $entityIds
     ) {
@@ -53,47 +44,12 @@ class PushOrdersCommand extends Command
             $headerInstance = new HeaderMap();
             $response = $recordOperations->createRecords($bodyWrapper, $headerInstance);
 
-            $this->processResult($response);
+            $this->processCreateResult(\Iidev\ZohoCRM\Model\ZohoOrder::class,$response);
         } catch (Exception $e) {
             $this->getLogger('ZohoCRM')->error('PushOrdersCommand Error:', [
                 'message' => $e->getMessage(),
                 'trace' => $e->getTrace(),
             ]);
-        }
-    }
-
-    protected function processResult($response)
-    {
-        if ($response != null) {
-            $actionHandler = $response->getObject();
-            if ($actionHandler instanceof ActionWrapper) {
-                $actionResponses = $actionHandler->getData();
-
-                $index = 0;
-                foreach ($actionResponses as $actionResponse) {
-
-                    $order = $this->entities[$index];
-
-                    if ($actionResponse instanceof SuccessResponse) {
-                        $details = $actionResponse->getDetails();
-                        if (isset($details['id'])) {
-                            $zohoId = $details['id'];
-
-                            $order->setZohoId($zohoId);
-                            Database::getEM()->persist($order);
-                        }
-                    } else if ($actionResponse instanceof APIException) {
-                        $this->getLogger('ZohoCRM')->error('APIException:', [
-                            $order->getOrderNumber(),
-                            $actionResponse->getDetails(),
-                            "Message" => $actionResponse->getMessage() instanceof Choice ? $actionResponse->getMessage()->getValue() : $actionResponse->getMessage()
-                        ]);
-                    }
-                    $index++;
-                }
-
-                Database::getEM()->flush();
-            }
         }
     }
 
@@ -155,7 +111,7 @@ class PushOrdersCommand extends Command
 
         $record->addFieldValue(new Field('staffNotes'), $order->getAdminNotes());
 
-        $profileId = $order->getOrigProfile()->getZohoId();
+        $profileId = $order->getOrigProfile()->getZohoModel()?->getZohoId();
 
         if ($profileId) {
             $profile = new Record();
@@ -192,7 +148,7 @@ class PushOrdersCommand extends Command
         }
 
         $lineItemProduct = new LineItemProduct();
-        $lineItemProduct->setId($item->getZohoId());
+        $lineItemProduct->setId($item->getZohoModel()?->getZohoId());
         $lineItemProduct->setName($orderItem->getName());
 
         $record = new Record();
