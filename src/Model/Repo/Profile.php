@@ -23,7 +23,8 @@ class Profile extends \XLite\Model\Repo\Profile
         $queryBuilder
             ->leftJoin('p.zohoModel', 'zm')
             ->andWhere('zm.profile_id IS NOT NULL')
-            ->andWhere('zm.skipped = true');
+            ->andWhere('zm.errors != :emptyString')
+            ->setParameter('emptyString', '');
     }
 
     public function findProfileIdsToCreateInZoho()

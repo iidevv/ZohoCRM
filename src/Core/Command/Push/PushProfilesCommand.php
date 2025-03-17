@@ -38,7 +38,7 @@ class PushProfilesCommand extends Command
             $headerInstance = new HeaderMap();
             $response = $recordOperations->createRecords($bodyWrapper, $headerInstance);
 
-            $this->processResult(\Iidev\ZohoCRM\Model\ZohoProfile::class, $response);
+            $this->processCreateResult(\Iidev\ZohoCRM\Model\ZohoProfile::class, $response);
         } catch (Exception $e) {
             $this->getLogger('ZohoCRM')->error('PushProfilesCommand Error:', [
                 'message' => $e->getMessage(),

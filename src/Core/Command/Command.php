@@ -34,7 +34,7 @@ class Command implements ICommand
         // Implement as needed
     }
 
-    protected function processResult($modelClass, $response)
+    protected function processCreateResult($modelClass, $response)
     {
         if ($response != null) {
             $actionHandler = $response->getObject();
