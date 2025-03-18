@@ -34,7 +34,7 @@ class Command implements ICommand
         // Implement as needed
     }
 
-    protected function processCreateResult($modelClass, $response)
+    protected function processCreateResult($modelClass, $response, $type = "")
     {
         if ($response != null) {
             $actionHandler = $response->getObject();
@@ -47,6 +47,7 @@ class Command implements ICommand
                     $model = $this->entities[$index];
 
                     $zohoModel = $model->getZohoModel();
+                    
                     if (!$zohoModel) {
                         $zohoModel = new $modelClass();
                         $zohoModel->setId($model);
@@ -57,7 +58,13 @@ class Command implements ICommand
                         $details = $actionResponse->getDetails();
                         if (isset($details['id'])) {
                             $zohoId = $details['id'];
-                            $zohoModel->setZohoId($zohoId);
+
+                            if($type === 'quote') {
+                                $zohoModel->setZohoQuoteId($zohoId);
+                            } else {
+                                $zohoModel->setZohoId($zohoId);
+                            }
+                            
                             Database::getEM()->persist($zohoModel);
                         }
                     } elseif ($actionResponse instanceof APIException) {

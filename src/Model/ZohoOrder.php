@@ -30,6 +30,12 @@ class ZohoOrder extends AEntity
     protected $zoho_id;
 
     /**
+     * @var string
+     * @ORM\Column(type="string", nullable=true)
+     */
+    protected $zoho_quote_id;
+
+    /**
      * @var boolean
      * @ORM\Column(type="boolean")
      */
@@ -60,6 +66,17 @@ class ZohoOrder extends AEntity
     public function setZohoId($zoho_id): self
     {
         $this->zoho_id = $zoho_id;
+        return $this;
+    }
+
+    public function getZohoQuoteId()
+    {
+        return $this->zoho_quote_id;
+    }
+
+    public function setZohoQuoteId($zoho_quote_id): self
+    {
+        $this->zoho_quote_id = $zoho_quote_id;
         return $this;
     }
 

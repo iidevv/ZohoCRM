@@ -10,7 +10,7 @@ use XLite\Core\Config;
 use com\zoho\crm\api\HeaderMap;
 use com\zoho\crm\api\record\RecordOperations;
 use com\zoho\crm\api\record\BodyWrapper;
-use com\zoho\crm\api\record\Sales_Orders;
+use com\zoho\crm\api\record\Quotes;
 use com\zoho\crm\api\record\LineItemProduct;
 use com\zoho\crm\api\record\Products;
 use com\zoho\crm\api\record\Record;
@@ -20,8 +20,12 @@ use com\zoho\crm\api\util\Choice;
 use XLite\Model\Base\Surcharge;
 use \XLite\Model\OrderItem;
 
-class PushOrdersCommand extends Command
+class PushQuotesCommand extends Command
 {
+    public const STATUS_CLOSED_WON = 'Closed Won';
+    public const STATUS_CLOSED_LOST = 'Closed Lost';
+    public const STATUS_ON_HOLD = 'On Hold';
+
     public function __construct(
         array $entityIds
     ) {
@@ -32,7 +36,7 @@ class PushOrdersCommand extends Command
     public function execute(): void
     {
         try {
-            $recordOperations = new RecordOperations('Sales_Orders');
+            $recordOperations = new RecordOperations('Quotes');
             $bodyWrapper = new BodyWrapper();
             $records = $this->getOrders();
 
@@ -44,9 +48,9 @@ class PushOrdersCommand extends Command
             $headerInstance = new HeaderMap();
             $response = $recordOperations->createRecords($bodyWrapper, $headerInstance);
 
-            $this->processCreateResult(\Iidev\ZohoCRM\Model\ZohoOrder::class, $response);
+            $this->processCreateResult(\Iidev\ZohoCRM\Model\ZohoOrder::class, $response, 'quote');
         } catch (Exception $e) {
-            $this->getLogger('ZohoCRM')->error('PushOrdersCommand Error:', [
+            $this->getLogger('ZohoCRM')->error('PushQuotesCommand Error:', [
                 'message' => $e->getMessage(),
                 'trace' => $e->getTrace(),
             ]);
@@ -73,39 +77,38 @@ class PushOrdersCommand extends Command
         $date = new \DateTime('@' . $order->getDate());
         $record->addFieldValue(new Field('placedOn'), $date);
 
-        $record->addFieldValue(Sales_Orders::Status(), new Choice($order->getShippingStatus()->getName()));
-        $record->addFieldValue(new Field('paymentStatus'), new Choice($order->getPaymentStatus()->getName()));
+        $record->addFieldValue(Quotes::QuoteStage(), new Choice($this->getQuoteStage($order)));
 
-        $record->addFieldValue(Sales_Orders::Subject(), "#{$order->getOrderNumber()}");
-        $record->addFieldValue(Sales_Orders::OrderedItems(), $this->getOrderItems($order->getItems()));
+        $record->addFieldValue(Quotes::Subject(), "#{$order->getOrderNumber()}");
+        $record->addFieldValue(Quotes::QuotedItems(), $this->getOrderItems($order->getItems()));
 
         $shippingAddress = $order->getProfile()->getShippingAddress();
         $billingAddress = $order->getProfile()->getBillingAddress();
 
         $shippingStreet = implode(' ', [$shippingAddress->getStreet(), $shippingAddress->getStreet2()]);
-        $record->addFieldValue(Sales_Orders::ShippingStreet(), $shippingStreet);
-        $record->addFieldValue(Sales_Orders::ShippingCity(), $shippingAddress->getCity());
-        $record->addFieldValue(Sales_Orders::ShippingCountry(), $shippingAddress->getCountryName());
-        $record->addFieldValue(Sales_Orders::ShippingState(), $shippingAddress->getStateName());
-        $record->addFieldValue(Sales_Orders::ShippingCode(), $shippingAddress->getZipcode());
+        $record->addFieldValue(Quotes::ShippingStreet(), $shippingStreet);
+        $record->addFieldValue(Quotes::ShippingCity(), $shippingAddress->getCity());
+        $record->addFieldValue(Quotes::ShippingCountry(), $shippingAddress->getCountryName());
+        $record->addFieldValue(Quotes::ShippingState(), $shippingAddress->getStateName());
+        $record->addFieldValue(Quotes::ShippingCode(), $shippingAddress->getZipcode());
         $record->addFieldValue(new Field('shippingPhone'), $shippingAddress->getPhone());
 
         $billingStreet = implode(' ', [$billingAddress->getStreet(), $billingAddress->getStreet2()]);
-        $record->addFieldValue(Sales_Orders::BillingStreet(), $billingStreet);
-        $record->addFieldValue(Sales_Orders::BillingCity(), $billingAddress->getCity());
-        $record->addFieldValue(Sales_Orders::BillingCountry(), $billingAddress->getCountryName());
-        $record->addFieldValue(Sales_Orders::BillingState(), $billingAddress->getStateName());
-        $record->addFieldValue(Sales_Orders::BillingCode(), $billingAddress->getZipcode());
+        $record->addFieldValue(Quotes::BillingStreet(), $billingStreet);
+        $record->addFieldValue(Quotes::BillingCity(), $billingAddress->getCity());
+        $record->addFieldValue(Quotes::BillingCountry(), $billingAddress->getCountryName());
+        $record->addFieldValue(Quotes::BillingState(), $billingAddress->getStateName());
+        $record->addFieldValue(Quotes::BillingCode(), $billingAddress->getZipcode());
         $record->addFieldValue(new Field('billingPhone'), $billingAddress->getPhone());
 
         $discount = $order->getSurchargeSumByType(Surcharge::TYPE_DISCOUNT);
-        $record->addFieldValue(Sales_Orders::Discount(), (double) abs($discount));
+        $record->addFieldValue(Quotes::Discount(), (double) abs($discount));
 
         $tax = $order->getSurchargeSumByType(Surcharge::TYPE_TAX);
         $shipping = $order->getSurchargeSumByType(Surcharge::TYPE_SHIPPING);
         $adjustment = $shipping + $tax;
 
-        $record->addFieldValue(Sales_Orders::Adjustment(), (double) $adjustment);
+        $record->addFieldValue(Quotes::Adjustment(), (double) $adjustment);
 
         $record->addFieldValue(new Field('customerNotes'), $order->getNotes());
 
@@ -116,21 +119,13 @@ class PushOrdersCommand extends Command
         if ($profileId) {
             $profile = new Record();
             $profile->setId($profileId);
-            $record->addFieldValue(new Field('contactName'), $profile);
-        }
-
-        $quoteId = $order->getZohoModel()?->getZohoQuoteId();
-
-        if ($quoteId) {
-            $quote = new Record();
-            $quote->setId($quoteId);
-            $record->addFieldValue(Sales_Orders::QuoteName(), $quote);
+            $record->addFieldValue(Quotes::ContactName(), $profile);
         }
 
         $owner = new MinifiedUser();
         $owner->setId(Config::getInstance()->Iidev->ZohoCRM->owner_id);
 
-        $record->addFieldValue(Sales_Orders::Owner(), $owner);
+        $record->addFieldValue(Quotes::Owner(), $owner);
 
         return $record;
     }
@@ -166,5 +161,20 @@ class PushOrdersCommand extends Command
         $record->addFieldValue(new Field('Quantity'), (double) $orderItem->getAmount());
 
         return $record;
+    }
+
+    protected function getQuoteStage(Order $order)
+    {
+        $paymentStatus = $order->getPaymentStatus()?->getCode();
+
+        if ($paymentStatus === \XLite\Model\Order\Status\Payment::STATUS_QUEUED || $paymentStatus === \XLite\Model\Order\Status\Payment::STATUS_AUTHORIZED) {
+            return static::STATUS_ON_HOLD;
+        }
+
+        if ($paymentStatus === \XLite\Model\Order\Status\Payment::STATUS_PAID || $paymentStatus === \XLite\Model\Order\Status\Payment::STATUS_PART_PAID) {
+            return static::STATUS_CLOSED_WON;
+        }
+
+        return static::STATUS_CLOSED_LOST;
     }
 }

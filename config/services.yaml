@@ -24,6 +24,7 @@ services:
   Iidev\ZohoCRM\Core\Dispatcher\UpdateProductVariantsDispatcher: ~
   Iidev\ZohoCRM\Core\Dispatcher\CreateProfilesDispatcher: ~
   Iidev\ZohoCRM\Core\Dispatcher\CreateOrdersDispatcher: ~
+  Iidev\ZohoCRM\Core\Dispatcher\CreateQuotesDispatcher: ~
 
   Iidev\ZohoCRM\Core\Factory\Commands\PushProductsCommandFactory:
   Iidev\ZohoCRM\Core\Factory\Commands\PushProductVariantsCommandFactory:
@@ -31,6 +32,7 @@ services:
   Iidev\ZohoCRM\Core\Factory\Commands\UpdateProductVariantsCommandFactory:
   Iidev\ZohoCRM\Core\Factory\Commands\PushProfilesCommandFactory:
   Iidev\ZohoCRM\Core\Factory\Commands\PushOrdersCommandFactory:
+  Iidev\ZohoCRM\Core\Factory\Commands\PushQuotesCommandFactory:
 
   Iidev\ZohoCRM\Core\Task\CreateProducts:
     tags:
@@ -63,6 +65,14 @@ services:
           event: xcart.cronjob,
           method: handleTask,
         }
+  
+  Iidev\ZohoCRM\Core\Task\CreateQuotes:
+    tags:
+      - {
+          name: kernel.event_listener,
+          event: xcart.cronjob,
+          method: handleTask,
+        }
 
   Iidev\ZohoCRM\Command\CreateProductsCommand:
     tags:
@@ -87,3 +97,7 @@ services:
   Iidev\ZohoCRM\Command\CreateOrdersCommand:
     tags:
       - { name: "console.command", command: "ZohoCRM:CreateOrders" }
+  
+  Iidev\ZohoCRM\Command\CreateQuotesCommand:
+    tags:
+      - { name: "console.command", command: "ZohoCRM:CreateQuotes" }
