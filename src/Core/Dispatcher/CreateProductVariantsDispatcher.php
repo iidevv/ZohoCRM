@@ -16,10 +16,6 @@ class CreateProductVariantsDispatcher
     {
         $entityIds = Database::getRepo(ProductVariant::class)->findVariantIdsToCreateInZoho();
 
-        if (empty($entityIds)) {
-            return;
-        }
-
         /** @var PushProductVariantsCommandFactory $commandFactory */
         $commandFactory = Container::getContainer() ? Container::getContainer()->get('Iidev\ZohoCRM\Core\Factory\Commands\PushProductVariantsCommandFactory') : null;
         $command        = $commandFactory->createCommand($entityIds);

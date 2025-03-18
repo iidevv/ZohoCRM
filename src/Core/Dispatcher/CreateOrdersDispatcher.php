@@ -4,6 +4,7 @@ namespace Iidev\ZohoCRM\Core\Dispatcher;
 
 use Iidev\ZohoCRM\Core\Factory\Commands\PushOrdersCommandFactory;
 use Iidev\ZohoCRM\Core\Factory\Commands\PushProfilesCommandFactory;
+use Iidev\ZohoCRM\Core\Factory\Commands\PushQuotesCommandFactory;
 use Iidev\ZohoCRM\Core\Factory\Commands\PushProductsCommandFactory;
 use Iidev\ZohoCRM\Core\Factory\Commands\PushProductVariantsCommandFactory;
 use Iidev\ZohoCRM\Messenger\Message\ExportMessage;
@@ -21,12 +22,8 @@ class CreateOrdersDispatcher
     {
         $entityIds = Database::getRepo(Order::class)->findOrderIdsToCreateInZoho();
 
-        if (empty($entityIds)) {
-            return;
-        }
-
         $this->orders = Database::getRepo(Order::class)->findByIds($entityIds);
-        $this->createProfilesAndProductsBeforePushOrders();
+        $this->createProfilesAndProducts();
 
         /** @var PushOrdersCommandFactory $commandFactory */
         $commandFactory = Container::getContainer() ? Container::getContainer()->get('Iidev\ZohoCRM\Core\Factory\Commands\PushOrdersCommandFactory') : null;
@@ -39,23 +36,23 @@ class CreateOrdersDispatcher
         return $this->message;
     }
 
-    protected function createProfilesAndProductsBeforePushOrders()
+    protected function createProfilesAndProducts()
     {
         $profileIds = [];
         $productIds = [];
         $productVariantIds = [];
         foreach ($this->orders as $order) {
             $profile = $order->getOrigProfile();
-            if ($profile && !$profile->getZohoId()) {
+            if ($profile && !$profile->getZohoModel()?->getZohoId()) {
                 $profileIds[] = $profile->getProfileId();
             }
 
             foreach ($order->getItems() as $orderItem) {
-                if ($orderItem->getVariant() && !$orderItem->getVariant()->getZohoId()) {
+                if ($orderItem->getVariant() && !$orderItem->getVariant()->getZohoModel()?->getZohoId()) {
                     $productVariantIds[] = $orderItem->getVariant()->getId();
                     continue;
                 }
-                if ($orderItem->getProduct()->getProductId() && !$orderItem->getProduct()->getZohoId()) {
+                if ($orderItem->getProduct()->getProductId() && !$orderItem->getProduct()->getZohoModel()?->getZohoId()) {
                     $productIds[] = $orderItem->getProduct()->getProductId();
                     continue;
                 }
@@ -63,7 +60,7 @@ class CreateOrdersDispatcher
                 $main = new \Iidev\ZohoCRM\Main();
                 $product = $main->getDeletedProductPlaceholder();
 
-                if ($product && !$product->getZohoId()) {
+                if ($product && !$product->getZohoModel()?->getZohoId()) {
                     $productIds[] = $product->getProductId();
                 }
             }

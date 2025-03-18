@@ -16,10 +16,6 @@ class UpdateProductVariantsDispatcher
     {
         $entityIds = Database::getRepo(ProductVariant::class)->findVariantIdsToSyncInZoho();
 
-        if (empty($entityIds)) {
-            return;
-        }
-
         /** @var UpdateProductVariantsCommandFactory $commandFactory */
         $commandFactory = Container::getContainer() ? Container::getContainer()->get('Iidev\ZohoCRM\Core\Factory\Commands\UpdateProductVariantsCommandFactory') : null;
         $command        = $commandFactory->createCommand($entityIds);

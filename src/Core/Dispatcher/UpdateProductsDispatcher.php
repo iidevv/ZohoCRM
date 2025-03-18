@@ -16,10 +16,6 @@ class UpdateProductsDispatcher
     {
         $entityIds = Database::getRepo(Product::class)->findProductIdsToSyncInZoho();
 
-        if (empty($entityIds)) {
-            return;
-        }
-
         /** @var UpdateProductsCommandFactory $commandFactory */
         $commandFactory = Container::getContainer() ? Container::getContainer()->get('Iidev\ZohoCRM\Core\Factory\Commands\UpdateProductsCommandFactory') : null;
         $command        = $commandFactory->createCommand($entityIds);

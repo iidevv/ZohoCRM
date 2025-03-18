@@ -16,10 +16,6 @@ class CreateProductsDispatcher
     {
         $entityIds = Database::getRepo(Product::class)->findProductIdsToCreateInZoho();
 
-        if (empty($entityIds)) {
-            return;
-        }
-
         /** @var PushProductsCommandFactory $commandFactory */
         $commandFactory = Container::getContainer() ? Container::getContainer()->get('Iidev\ZohoCRM\Core\Factory\Commands\PushProductsCommandFactory') : null;
         $command        = $commandFactory->createCommand($entityIds);
