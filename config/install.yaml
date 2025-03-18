@@ -1,4 +1,11 @@
 XLite\Model\Config:
+  - name: store_path
+    category: Iidev\ZohoCRM
+    type: XLite\View\FormField\Input\Text
+    orderby: 0
+    translations:
+      - code: en
+        option_name: "File store path"
   - name: owner_id
     category: Iidev\ZohoCRM
     type: XLite\View\FormField\Input\Text
