@@ -35,8 +35,32 @@ class Order extends \XLite\Model\Repo\Order
 
         $qb = $this->createQueryBuilder('o')
             ->leftJoin('o.zohoModel', 'zm')
+            ->andWhere('o.payment_method_name != :paymentMethod OR zm.zoho_quote_id IS NOT NULL')
             ->andWhere('zm.zoho_id IS NULL')
             ->andWhere('zm.skipped = false OR zm.skipped IS NULL')
+            ->setParameter('paymentMethod', 'Quote')
+            ->select('o.order_id')
+            ->setMaxResults(30);
+
+        if ($createOrdersFrom > 0) {
+            $qb->andWhere('o.orderNumber >= :orderNumber')
+                ->setParameter('orderNumber', $createOrdersFrom);
+        }
+
+        return $qb->getQuery()->getSingleColumnResult();
+    }
+
+    public function findQuoteIdsToCreateInZoho()
+    {
+        $createOrdersFrom = (int) Config::getInstance()->Iidev->ZohoCRM->orders_from_number;
+
+        $qb = $this->createQueryBuilder('o')
+            ->leftJoin('o.zohoModel', 'zm')
+            ->andWhere('o.payment_method_name = :paymentMethod')
+            ->andWhere('zm.zoho_quote_id IS NULL')
+            ->andWhere('zm.zoho_id IS NULL')
+            ->andWhere('zm.skipped = false OR zm.skipped IS NULL')
+            ->setParameter('paymentMethod', 'Quote')
             ->select('o.order_id')
             ->setMaxResults(30);
 

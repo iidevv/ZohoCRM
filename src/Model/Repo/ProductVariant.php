@@ -31,7 +31,7 @@ class ProductVariant extends \XC\ProductVariants\Model\Repo\ProductVariant
     {
         return $this->createQueryBuilder('v')
             ->leftJoin('v.zohoModel', 'zm')
-            ->where('zm.zoho_id IS NULL')
+            ->andWhere('zm.zoho_id IS NULL')
             ->select('v.id')
             ->setMaxResults(30)
             ->getQuery()->getSingleColumnResult();
@@ -41,7 +41,7 @@ class ProductVariant extends \XC\ProductVariants\Model\Repo\ProductVariant
     {
         return $this->createQueryBuilder('v')
             ->leftJoin('v.zohoModel', 'zm')
-            ->where('zm.zoho_id IS NOT NULL')
+            ->andWhere('zm.zoho_id IS NOT NULL')
             ->andWhere('zm.last_synced < :timeLimit')
             ->setParameter('timeLimit', time() - 3600)
             ->orderBy('zm.last_synced', 'DESC')

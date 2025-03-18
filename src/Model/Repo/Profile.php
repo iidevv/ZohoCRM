@@ -32,7 +32,7 @@ class Profile extends \XLite\Model\Repo\Profile
         return $this->createQueryBuilder('p')
             ->leftJoin('p.zohoModel', 'zm')
             ->join('p.addresses', 'a')
-            ->where('p.order IS NULL')
+            ->andWhere('p.order IS NULL')
             ->andWhere('zm.zoho_id IS NULL')
             ->andWhere('zm.skipped = false OR zm.skipped IS NULL')
             ->andWhere('a.address_id IS NOT NULL')

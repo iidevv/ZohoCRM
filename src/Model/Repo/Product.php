@@ -31,7 +31,7 @@ class Product extends \XLite\Model\Repo\Product
     {
         return $this->createQueryBuilder('p')
             ->leftJoin('p.zohoModel', 'zm')
-            ->where('p.enabled = :enabled')
+            ->andWhere('p.enabled = :enabled')
             ->andWhere('zm.zoho_id IS NULL')
             ->andWhere('zm.skipped = false OR zm.skipped IS NULL')
             ->setParameter('enabled', 1)
@@ -44,7 +44,7 @@ class Product extends \XLite\Model\Repo\Product
     {
         return $this->createQueryBuilder('p')
             ->leftJoin('p.zohoModel', 'zm')
-            ->where('p.enabled = :enabled')
+            ->andWhere('p.enabled = :enabled')
             ->andWhere('zm.zoho_id IS NOT NULL')
             ->andWhere('zm.last_synced < :timeLimit')
             ->setParameter('enabled', 1)
