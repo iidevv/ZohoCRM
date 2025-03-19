@@ -13,6 +13,9 @@ use com\zoho\crm\api\record\BodyWrapper;
 use com\zoho\crm\api\record\Contacts;
 use com\zoho\crm\api\record\Record;
 use com\zoho\crm\api\users\MinifiedUser;
+use com\zoho\crm\api\record\Field;
+use com\zoho\crm\api\util\Choice;
+
 
 class PushProfilesCommand extends Command
 {
@@ -65,6 +68,10 @@ class PushProfilesCommand extends Command
         $record = new Record();
 
         $record->addFieldValue(Contacts::Email(), $profile->getLogin());
+
+        $membership = $profile->getMembershipId() ? "Professional (Pro)" : "-None-";
+
+        $record->addFieldValue(new Field('membership'), new Choice($membership));
 
         if (!empty($profile->getBillingAddress())) {
             $record->addFieldValue(Contacts::FirstName(), $profile->getBillingAddress()->getFirstname());
