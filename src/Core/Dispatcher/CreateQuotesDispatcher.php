@@ -12,7 +12,7 @@ class CreateQuotesDispatcher extends Dispatcher
 {
     protected ExportMessage $message;
 
-    private array $orders = [];
+    protected array $orders = [];
 
     public function __construct()
     {

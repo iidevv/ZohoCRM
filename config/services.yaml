@@ -16,7 +16,7 @@ services:
   Iidev\ZohoCRM\Messenger\Handler\ExportHandler:
     tags:
       - name: messenger.message_handler
-        handles: Qualiteam\SkinActSkuVault\Messenger\Message\ExportMessage
+        handles: Iidev\ZohoCRM\Messenger\Message\ExportMessage
 
   Iidev\ZohoCRM\Core\Dispatcher\CreateProductsDispatcher: ~
   Iidev\ZohoCRM\Core\Dispatcher\CreateProductVariantsDispatcher: ~
@@ -24,6 +24,7 @@ services:
   Iidev\ZohoCRM\Core\Dispatcher\UpdateProductVariantsDispatcher: ~
   Iidev\ZohoCRM\Core\Dispatcher\CreateProfilesDispatcher: ~
   Iidev\ZohoCRM\Core\Dispatcher\CreateOrdersDispatcher: ~
+  Iidev\ZohoCRM\Core\Dispatcher\CreateOrderMessagesDispatcher: ~
   Iidev\ZohoCRM\Core\Dispatcher\CreateQuotesDispatcher: ~
 
   Iidev\ZohoCRM\Core\Factory\Commands\PushProductsCommandFactory:
@@ -32,6 +33,7 @@ services:
   Iidev\ZohoCRM\Core\Factory\Commands\UpdateProductVariantsCommandFactory:
   Iidev\ZohoCRM\Core\Factory\Commands\PushProfilesCommandFactory:
   Iidev\ZohoCRM\Core\Factory\Commands\PushOrdersCommandFactory:
+  Iidev\ZohoCRM\Core\Factory\Commands\PushOrderMessagesCommandFactory:
   Iidev\ZohoCRM\Core\Factory\Commands\PushQuotesCommandFactory:
 
   Iidev\ZohoCRM\Core\Task\CreateProducts:
@@ -59,6 +61,14 @@ services:
         }
 
   Iidev\ZohoCRM\Core\Task\CreateOrders:
+    tags:
+      - {
+          name: kernel.event_listener,
+          event: xcart.cronjob,
+          method: handleTask,
+        }
+  
+  Iidev\ZohoCRM\Core\Task\CreateOrderMessages:
     tags:
       - {
           name: kernel.event_listener,
@@ -97,6 +107,10 @@ services:
   Iidev\ZohoCRM\Command\CreateOrdersCommand:
     tags:
       - { name: "console.command", command: "ZohoCRM:CreateOrders" }
+  
+  Iidev\ZohoCRM\Command\CreateOrderMessagesCommand:
+    tags:
+      - { name: "console.command", command: "ZohoCRM:CreateOrderMessages" }
   
   Iidev\ZohoCRM\Command\CreateQuotesCommand:
     tags:

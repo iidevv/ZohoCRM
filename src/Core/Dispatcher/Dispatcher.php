@@ -9,6 +9,8 @@ use XCart\Container;
 
 class Dispatcher
 {
+    protected array $orders = [];
+
     public function __construct()
     {
     }
