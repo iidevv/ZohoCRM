@@ -77,6 +77,7 @@ class PushProfilesCommand extends Command
             $record->addFieldValue(Contacts::FirstName(), $profile->getBillingAddress()->getFirstname());
             $record->addFieldValue(Contacts::LastName(), $profile->getBillingAddress()->getLastname());
             $record->addFieldValue(Contacts::Phone(), $profile->getBillingAddress()->getPhone());
+            $record->addFieldValue(new Field('company'), $profile->getBillingAddress()->getCompany());
         }
 
         if (!empty($profile->getShippingAddress())) {
