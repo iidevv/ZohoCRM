@@ -2,7 +2,7 @@
 
 namespace Iidev\ZohoCRM\Core\Factory\Commands;
 
-use Iidev\ZohoCRM\Core\Command\Push\PushOrdersCommand;
+use Iidev\ZohoCRM\Core\Command\Push\Orders\PushOrdersCommand;
 
 class PushOrdersCommandFactory
 {

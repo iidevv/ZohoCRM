@@ -2,7 +2,7 @@
 
 namespace Iidev\ZohoCRM\Core\Factory\Commands;
 
-use Iidev\ZohoCRM\Core\Command\Push\PushProfilesCommand;
+use Iidev\ZohoCRM\Core\Command\Push\Profiles\PushProfilesCommand;
 
 class PushProfilesCommandFactory
 {

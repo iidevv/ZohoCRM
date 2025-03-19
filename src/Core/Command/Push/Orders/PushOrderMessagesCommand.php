@@ -1,6 +1,6 @@
 <?php
 
-namespace Iidev\ZohoCRM\Core\Command\Push;
+namespace Iidev\ZohoCRM\Core\Command\Push\Orders;
 
 use Exception;
 use Iidev\ZohoCRM\Core\Command\Command;

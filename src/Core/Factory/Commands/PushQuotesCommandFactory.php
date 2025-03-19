@@ -2,7 +2,7 @@
 
 namespace Iidev\ZohoCRM\Core\Factory\Commands;
 
-use Iidev\ZohoCRM\Core\Command\Push\PushQuotesCommand;
+use Iidev\ZohoCRM\Core\Command\Push\Quotes\PushQuotesCommand;
 
 class PushQuotesCommandFactory
 {

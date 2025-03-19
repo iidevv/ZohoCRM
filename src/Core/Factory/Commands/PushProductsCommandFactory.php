@@ -2,7 +2,7 @@
 
 namespace Iidev\ZohoCRM\Core\Factory\Commands;
 
-use Iidev\ZohoCRM\Core\Command\Push\PushProductsCommand;
+use Iidev\ZohoCRM\Core\Command\Push\Products\PushProductsCommand;
 
 class PushProductsCommandFactory
 {

@@ -2,7 +2,7 @@
 
 namespace Iidev\ZohoCRM\Core\Factory\Commands;
 
-use Iidev\ZohoCRM\Core\Command\Push\UpdateProductVariantsCommand;
+use Iidev\ZohoCRM\Core\Command\Push\Products\UpdateProductVariantsCommand;
 
 class UpdateProductVariantsCommandFactory
 {
