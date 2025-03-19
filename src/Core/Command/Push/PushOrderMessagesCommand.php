@@ -13,7 +13,6 @@ use com\zoho\crm\api\record\BodyWrapper;
 use com\zoho\crm\api\record\Record;
 use com\zoho\crm\api\users\MinifiedUser;
 use com\zoho\crm\api\record\Field;
-use com\zoho\crm\api\util\Choice;
 
 class PushOrderMessagesCommand extends Command
 {
