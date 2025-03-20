@@ -17,26 +17,38 @@ services:
     tags:
       - name: messenger.message_handler
         handles: Iidev\ZohoCRM\Messenger\Message\ExportMessage
+  
+  # Dispatcher
 
-  Iidev\ZohoCRM\Core\Dispatcher\CreateProductsDispatcher: ~
-  Iidev\ZohoCRM\Core\Dispatcher\CreateProductVariantsDispatcher: ~
-  Iidev\ZohoCRM\Core\Dispatcher\UpdateProductsDispatcher: ~
-  Iidev\ZohoCRM\Core\Dispatcher\UpdateProductVariantsDispatcher: ~
-  Iidev\ZohoCRM\Core\Dispatcher\CreateProfilesDispatcher: ~
-  Iidev\ZohoCRM\Core\Dispatcher\CreateOrdersDispatcher: ~
-  Iidev\ZohoCRM\Core\Dispatcher\CreateOrderMessagesDispatcher: ~
-  Iidev\ZohoCRM\Core\Dispatcher\CreateQuotesDispatcher: ~
+  Iidev\ZohoCRM\Core\Dispatcher\Products\CreateProductsDispatcher: ~
+  Iidev\ZohoCRM\Core\Dispatcher\Products\CreateProductVariantsDispatcher: ~
+  Iidev\ZohoCRM\Core\Dispatcher\Products\UpdateProductsDispatcher: ~
+  Iidev\ZohoCRM\Core\Dispatcher\Products\UpdateProductVariantsDispatcher: ~
 
-  Iidev\ZohoCRM\Core\Factory\Commands\PushProductsCommandFactory:
-  Iidev\ZohoCRM\Core\Factory\Commands\PushProductVariantsCommandFactory:
-  Iidev\ZohoCRM\Core\Factory\Commands\UpdateProductsCommandFactory:
-  Iidev\ZohoCRM\Core\Factory\Commands\UpdateProductVariantsCommandFactory:
-  Iidev\ZohoCRM\Core\Factory\Commands\PushProfilesCommandFactory:
-  Iidev\ZohoCRM\Core\Factory\Commands\PushOrdersCommandFactory:
-  Iidev\ZohoCRM\Core\Factory\Commands\PushOrderMessagesCommandFactory:
-  Iidev\ZohoCRM\Core\Factory\Commands\PushQuotesCommandFactory:
+  Iidev\ZohoCRM\Core\Dispatcher\Profiles\CreateProfilesDispatcher: ~
 
-  Iidev\ZohoCRM\Core\Task\CreateProducts:
+  Iidev\ZohoCRM\Core\Dispatcher\Orders\CreateOrdersDispatcher: ~
+  Iidev\ZohoCRM\Core\Dispatcher\Orders\CreateOrderMessagesDispatcher: ~
+
+  Iidev\ZohoCRM\Core\Dispatcher\Quotes\CreateQuotesDispatcher: ~
+
+  # CommandFactory
+
+  Iidev\ZohoCRM\Core\Factory\Commands\Products\PushProductsCommandFactory:
+  Iidev\ZohoCRM\Core\Factory\Commands\Products\PushProductVariantsCommandFactory:
+  Iidev\ZohoCRM\Core\Factory\Commands\Products\UpdateProductsCommandFactory:
+  Iidev\ZohoCRM\Core\Factory\Commands\Products\UpdateProductVariantsCommandFactory:
+
+  Iidev\ZohoCRM\Core\Factory\Commands\Profiles\PushProfilesCommandFactory:
+
+  Iidev\ZohoCRM\Core\Factory\Commands\Orders\PushOrdersCommandFactory:
+  Iidev\ZohoCRM\Core\Factory\Commands\Orders\PushOrderMessagesCommandFactory:
+
+  Iidev\ZohoCRM\Core\Factory\Commands\Quotes\PushQuotesCommandFactory:
+
+  # Task
+
+  Iidev\ZohoCRM\Core\Task\Products\CreateProducts:
     tags:
       - {
           name: kernel.event_listener,
@@ -44,7 +56,7 @@ services:
           method: handleTask,
         }
 
-  Iidev\ZohoCRM\Core\Task\UpdateProducts:
+  Iidev\ZohoCRM\Core\Task\Products\UpdateProducts:
     tags:
       - {
           name: kernel.event_listener,
@@ -52,7 +64,7 @@ services:
           method: handleTask,
         }
 
-  Iidev\ZohoCRM\Core\Task\CreateProfiles:
+  Iidev\ZohoCRM\Core\Task\Profiles\CreateProfiles:
     tags:
       - {
           name: kernel.event_listener,
@@ -60,7 +72,7 @@ services:
           method: handleTask,
         }
 
-  Iidev\ZohoCRM\Core\Task\CreateOrders:
+  Iidev\ZohoCRM\Core\Task\Orders\CreateOrders:
     tags:
       - {
           name: kernel.event_listener,
@@ -68,7 +80,7 @@ services:
           method: handleTask,
         }
   
-  Iidev\ZohoCRM\Core\Task\CreateOrderMessages:
+  Iidev\ZohoCRM\Core\Task\Orders\CreateOrderMessages:
     tags:
       - {
           name: kernel.event_listener,
@@ -76,7 +88,7 @@ services:
           method: handleTask,
         }
   
-  Iidev\ZohoCRM\Core\Task\CreateQuotes:
+  Iidev\ZohoCRM\Core\Task\Quotes\CreateQuotes:
     tags:
       - {
           name: kernel.event_listener,
@@ -84,34 +96,36 @@ services:
           method: handleTask,
         }
 
-  Iidev\ZohoCRM\Command\CreateProductsCommand:
+  # Command
+
+  Iidev\ZohoCRM\Command\Products\CreateProductsCommand:
     tags:
       - { name: "console.command", command: "ZohoCRM:CreateProducts" }
 
-  Iidev\ZohoCRM\Command\CreateProductVariantsCommand:
+  Iidev\ZohoCRM\Command\Products\CreateProductVariantsCommand:
     tags:
       - { name: "console.command", command: "ZohoCRM:CreateProductVariants" }
 
-  Iidev\ZohoCRM\Command\UpdateProductsCommand:
+  Iidev\ZohoCRM\Command\Products\UpdateProductsCommand:
     tags:
       - { name: "console.command", command: "ZohoCRM:UpdateProducts" }
 
-  Iidev\ZohoCRM\Command\UpdateProductVariantsCommand:
+  Iidev\ZohoCRM\Command\Products\UpdateProductVariantsCommand:
     tags:
       - { name: "console.command", command: "ZohoCRM:UpdateProductVariants" }
 
-  Iidev\ZohoCRM\Command\CreateProfilesCommand:
+  Iidev\ZohoCRM\Command\Profiles\CreateProfilesCommand:
     tags:
       - { name: "console.command", command: "ZohoCRM:CreateProfiles" }
 
-  Iidev\ZohoCRM\Command\CreateOrdersCommand:
+  Iidev\ZohoCRM\Command\Orders\CreateOrdersCommand:
     tags:
       - { name: "console.command", command: "ZohoCRM:CreateOrders" }
   
-  Iidev\ZohoCRM\Command\CreateOrderMessagesCommand:
+  Iidev\ZohoCRM\Command\Orders\CreateOrderMessagesCommand:
     tags:
       - { name: "console.command", command: "ZohoCRM:CreateOrderMessages" }
   
-  Iidev\ZohoCRM\Command\CreateQuotesCommand:
+  Iidev\ZohoCRM\Command\Quotes\CreateQuotesCommand:
     tags:
       - { name: "console.command", command: "ZohoCRM:CreateQuotes" }

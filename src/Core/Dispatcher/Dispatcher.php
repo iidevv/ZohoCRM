@@ -2,9 +2,9 @@
 
 namespace Iidev\ZohoCRM\Core\Dispatcher;
 
-use Iidev\ZohoCRM\Core\Factory\Commands\PushProfilesCommandFactory;
-use Iidev\ZohoCRM\Core\Factory\Commands\PushProductsCommandFactory;
-use Iidev\ZohoCRM\Core\Factory\Commands\PushProductVariantsCommandFactory;
+use Iidev\ZohoCRM\Core\Factory\Commands\Profiles\PushProfilesCommandFactory;
+use Iidev\ZohoCRM\Core\Factory\Commands\Products\PushProductsCommandFactory;
+use Iidev\ZohoCRM\Core\Factory\Commands\Products\PushProductVariantsCommandFactory;
 use XCart\Container;
 
 class Dispatcher
@@ -51,21 +51,21 @@ class Dispatcher
 
         if (!empty($profileIds)) {
             /** @var PushProfilesCommandFactory $profilesFactory */
-            $profilesFactory = Container::getContainer()->get('Iidev\ZohoCRM\Core\Factory\Commands\PushProfilesCommandFactory');
+            $profilesFactory = Container::getContainer()->get(PushProfilesCommandFactory::class);
             $profilesCommand = $profilesFactory->createCommand($profileIds);
             $profilesCommand->execute();
         }
 
         if (!empty($productIds)) {
             /** @var PushProductsCommandFactory $productsFactory */
-            $productsFactory = Container::getContainer()->get('Iidev\ZohoCRM\Core\Factory\Commands\PushProductsCommandFactory');
+            $productsFactory = Container::getContainer()->get(PushProductsCommandFactory::class);
             $productsCommand = $productsFactory->createCommand($productIds);
             $productsCommand->execute();
         }
 
         if (!empty($productVariantIds)) {
             /** @var PushProductVariantsCommandFactory $productsFactory */
-            $productsFactory = Container::getContainer()->get('Iidev\ZohoCRM\Core\Factory\Commands\PushProductVariantsCommandFactory');
+            $productsFactory = Container::getContainer()->get(PushProductVariantsCommandFactory::class);
             $productsCommand = $productsFactory->createCommand($productVariantIds);
             $productsCommand->execute();
         }
