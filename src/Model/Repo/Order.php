@@ -50,6 +50,19 @@ class Order extends \XLite\Model\Repo\Order
         return $qb->getQuery()->getSingleColumnResult();
     }
 
+    public function findOrderIdsToUpdateInZoho()
+    {
+        return $this->createQueryBuilder('o')
+            ->leftJoin('o.zohoModel', 'zm')
+            ->andWhere('zm.zoho_id IS NOT NULL')
+            ->andWhere('zm.synced = false')
+            ->andWhere('zm.skipped = false OR zm.skipped IS NULL')
+            ->select('o.order_id')
+            ->setMaxResults(30)
+            ->getQuery()
+            ->getSingleColumnResult();
+    }
+
     public function findQuoteIdsToCreateInZoho()
     {
         $createOrdersFrom = (int) Config::getInstance()->Iidev->ZohoCRM->orders_from_number;

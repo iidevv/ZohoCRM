@@ -10,6 +10,12 @@ use com\zoho\crm\api\record\SuccessResponse;
 use com\zoho\crm\api\record\APIException;
 use Iidev\ZohoCRM\Core\ZohoAwareInterface;
 use XLite\InjectLoggerTrait;
+use com\zoho\crm\api\record\Record;
+use com\zoho\crm\api\record\Field;
+use com\zoho\crm\api\record\LineItemProduct;
+use com\zoho\crm\api\record\Products;
+use \XLite\Model\OrderItem;
+use XLite\Model\Order;
 
 class Command implements ICommand
 {
@@ -47,7 +53,7 @@ class Command implements ICommand
                     $model = $this->entities[$index];
 
                     $zohoModel = $model->getZohoModel();
-                    
+
                     if (!$zohoModel) {
                         $zohoModel = new $modelClass();
                         $zohoModel->setId($model);
@@ -59,13 +65,12 @@ class Command implements ICommand
                         if (isset($details['id'])) {
                             $zohoId = $details['id'];
 
-                            if($type === 'quote') {
+                            if ($type === 'quote') {
                                 $zohoModel->setZohoQuoteId($zohoId);
                             } else {
                                 $zohoModel->setZohoId($zohoId);
                             }
-                            
-                            Database::getEM()->persist($zohoModel);
+
                         }
                     } elseif ($actionResponse instanceof APIException) {
                         $errors = [
@@ -74,8 +79,13 @@ class Command implements ICommand
                         ];
                         $zohoModel->setErrors(json_encode($errors));
                         $zohoModel->setSkipped(true);
-                        Database::getEM()->persist($zohoModel);
                     }
+
+                    if ($zohoModel instanceof \Iidev\ZohoCRM\Model\ZohoOrder) {
+                        $zohoModel->setTotal($model->getTotal());
+                    }
+
+                    Database::getEM()->persist($zohoModel);
                     $index++;
                 }
 
@@ -84,31 +94,91 @@ class Command implements ICommand
         }
     }
 
-    protected function processUpdateResult($response)
+    protected function processUpdateResult($response, $type = "")
     {
         if ($response != null) {
             $actionHandler = $response->getObject();
             if ($actionHandler instanceof ActionWrapper) {
                 $actionResponses = $actionHandler->getData();
 
+                $index = 0;
                 foreach ($actionResponses as $actionResponse) {
-                    if ($actionResponse instanceof APIException) {
-                        $this->getLogger('ZohoCRM')->error('processUpdateResult APIException:', [
-                            $actionResponse->getStatus(),
-                            $actionResponse->getCode(),
-                            $actionResponse->getDetails(),
-                        ]);
-                    }
-                }
+                    /** @var ZohoAwareInterface $model */
+                    $model = $this->entities[$index];
 
-                foreach ($this->entities as $entity) {
-                    $zohoModel = $entity->getZohoModel();
-                    $zohoModel->setLastSynced(time());
+                    $zohoModel = $model->getZohoModel();
+
+                    if ($actionResponse instanceof SuccessResponse) {
+                        if ($type === 'quote') {
+                            $zohoModel->setQuoteSynced(true);
+                        } else {
+                            $zohoModel->setSynced(true);
+                        }
+                    } elseif ($actionResponse instanceof APIException) {
+                        $errors = [
+                            "message" => $actionResponse->getMessage() instanceof Choice ? $actionResponse->getMessage()->getValue() : $actionResponse->getMessage(),
+                            "details" => $actionResponse->getDetails(),
+                        ];
+                        $zohoModel->setErrors(json_encode($errors));
+                        $zohoModel->setSkipped(true);
+                    }
+
+                    if ($zohoModel instanceof \Iidev\ZohoCRM\Model\ZohoOrder) {
+                        $zohoModel->setTotal($model->getTotal());
+                    }
+
                     Database::getEM()->persist($zohoModel);
+                    $index++;
                 }
 
                 Database::getEM()->flush();
             }
         }
+    }
+
+    protected function getOrders()
+    {
+        $records = [];
+        $orders = Database::getRepo(Order::class)->findByIds($this->entityIds);
+
+        foreach ($orders as $order) {
+            $records[] = $this->getOrder($order);
+            $this->entities[] = $order;
+        }
+
+        return $records;
+    }
+
+    protected function getOrderItems($orderItems)
+    {
+        $items = [];
+
+        foreach ($orderItems as $orderItem) {
+            $items[] = $this->getOrderItem($orderItem);
+        }
+
+        return $items;
+    }
+
+    protected function getOrderItem(OrderItem $orderItem)
+    {
+        $item = $orderItem->getVariant() ? $orderItem->getVariant() : $orderItem->getProduct();
+
+        if ($orderItem->isDeleted() || !$item->getZohoModel()?->getZohoId()) {
+            $main = new \Iidev\ZohoCRM\Main();
+            $item = $main->getDeletedProductPlaceholder();
+        }
+
+        $lineItemProduct = new LineItemProduct();
+        $lineItemProduct->setId($item->getZohoModel()?->getZohoId());
+        $lineItemProduct->setName($orderItem->getName());
+
+        $record = new Record();
+        $record->addFieldValue(Products::ProductName(), $lineItemProduct);
+
+        $record->addFieldValue(new Field('List_Price'), (double) $orderItem->getTotal() / $orderItem->getAmount());
+        $record->addFieldValue(new Field('Quantity'), (double) $orderItem->getAmount());
+
+        return $record;
     }
 }

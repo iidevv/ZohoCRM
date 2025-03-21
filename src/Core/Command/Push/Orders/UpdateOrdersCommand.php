@@ -2,22 +2,26 @@
 
 namespace Iidev\ZohoCRM\Core\Command\Push\Orders;
 
+use com\zoho\crm\api\record\GetRecordsParam;
 use Exception;
 use Iidev\ZohoCRM\Core\Command\Command;
 use XLite\Model\Order;
-use XLite\Core\Config;
+use XLite\Model\Base\Surcharge;
 use com\zoho\crm\api\HeaderMap;
 use com\zoho\crm\api\record\RecordOperations;
 use com\zoho\crm\api\record\BodyWrapper;
 use com\zoho\crm\api\record\Sales_Orders;
 use com\zoho\crm\api\record\Record;
-use com\zoho\crm\api\users\MinifiedUser;
 use com\zoho\crm\api\record\Field;
 use com\zoho\crm\api\util\Choice;
-use XLite\Model\Base\Surcharge;
+use com\zoho\crm\api\ParameterMap;
+use com\zoho\crm\api\record\Products;
+use com\zoho\crm\api\record\ResponseWrapper;
 
-class PushOrdersCommand extends Command
+class UpdateOrdersCommand extends Command
 {
+    protected array $deletedItems = [];
+
     public function __construct(
         array $entityIds
     ) {
@@ -38,11 +42,11 @@ class PushOrdersCommand extends Command
 
             $bodyWrapper->setData($records);
             $headerInstance = new HeaderMap();
-            $response = $recordOperations->createRecords($bodyWrapper, $headerInstance);
+            $response = $recordOperations->updateRecords($bodyWrapper, $headerInstance);
 
-            $this->processCreateResult(\Iidev\ZohoCRM\Model\ZohoOrder::class, $response);
+            $this->processUpdateResult($response);
         } catch (Exception $e) {
-            $this->getLogger('ZohoCRM')->error('PushOrdersCommand Error:', [
+            $this->getLogger('ZohoCRM')->error('UpdateOrdersCommand Error:', [
                 'message' => $e->getMessage(),
                 'trace' => $e->getTrace(),
             ]);
@@ -51,16 +55,14 @@ class PushOrdersCommand extends Command
 
     protected function getOrder(Order $order)
     {
+        $zohoId = $order->getZohoModel()->getZohoId();
+
         $record = new Record();
 
-        $date = new \DateTime('@' . $order->getDate());
-        $record->addFieldValue(new Field('placedOn'), $date);
+        $record->addFieldValue(Sales_Orders::id(), $zohoId);
 
         $record->addFieldValue(Sales_Orders::Status(), new Choice($order->getShippingStatus()->getName()));
         $record->addFieldValue(new Field('paymentStatus'), new Choice($order->getPaymentStatus()->getName()));
-
-        $record->addFieldValue(Sales_Orders::Subject(), "#{$order->getOrderNumber()}");
-        $record->addFieldValue(Sales_Orders::OrderedItems(), $this->getOrderItems($order->getItems()));
 
         $shippingAddress = $order->getProfile()->getShippingAddress();
         $billingAddress = $order->getProfile()->getBillingAddress();
@@ -81,15 +83,6 @@ class PushOrdersCommand extends Command
         $record->addFieldValue(Sales_Orders::BillingCode(), $billingAddress->getZipcode());
         $record->addFieldValue(new Field('billingPhone'), $billingAddress->getPhone());
 
-        $discount = $order->getSurchargeSumByType(Surcharge::TYPE_DISCOUNT);
-        $record->addFieldValue(Sales_Orders::Discount(), (double) abs($discount));
-
-        $tax = $order->getSurchargeSumByType(Surcharge::TYPE_TAX);
-        $shipping = $order->getSurchargeSumByType(Surcharge::TYPE_SHIPPING);
-        $adjustment = $shipping + $tax;
-
-        $record->addFieldValue(Sales_Orders::Adjustment(), (double) $adjustment);
-
         $record->addFieldValue(new Field('customerNotes'), $order->getNotes());
 
         $record->addFieldValue(new Field('staffNotes'), $order->getAdminNotes());
@@ -102,19 +95,73 @@ class PushOrdersCommand extends Command
             $record->addFieldValue(new Field('contactName'), $profile);
         }
 
-        $quoteId = $order->getZohoModel()?->getZohoQuoteId();
+        if ($order->getTotal() !== $order->getZohoModel()->getTotal()) {
+            $this->getExistingLineItems($zohoId);
 
-        if ($quoteId) {
-            $quote = new Record();
-            $quote->setId($quoteId);
-            $record->addFieldValue(Sales_Orders::QuoteName(), $quote);
+            $orderedProducts = array_merge($this->getOrderItems($order->getItems()), $this->deletedItems);
+
+            $record->addFieldValue(Sales_Orders::OrderedItems(), $orderedProducts);
+
+            $discount = $order->getSurchargeSumByType(Surcharge::TYPE_DISCOUNT);
+            $record->addFieldValue(Sales_Orders::Discount(), (double) abs($discount));
+
+            $tax = $order->getSurchargeSumByType(Surcharge::TYPE_TAX);
+            $shipping = $order->getSurchargeSumByType(Surcharge::TYPE_SHIPPING);
+            $adjustment = $shipping + $tax;
+
+            $record->addFieldValue(Sales_Orders::Adjustment(), (double) $adjustment);
         }
 
-        $owner = new MinifiedUser();
-        $owner->setId(Config::getInstance()->Iidev->ZohoCRM->owner_id);
-
-        $record->addFieldValue(Sales_Orders::Owner(), $owner);
-
         return $record;
+    }
+
+    protected function getExistingLineItems(string $recordId): void
+    {
+        $recordOperations = new RecordOperations('Sales_Orders');
+        $headerInstance = new HeaderMap();
+        $paramInstance = new ParameterMap();
+        $paramInstance->add(GetRecordsParam::fields(), "Ordered_Items");
+
+        try {
+            $response = $recordOperations->getRecord($recordId, $paramInstance, $headerInstance);
+            $this->processGetResult($response);
+        } catch (Exception $e) {
+            $this->getLogger('ZohoCRM')->error('Error get existing line items', [
+                'record_id' => $recordId,
+                'code' => $e->getCode(),
+                'message' => $e->getMessage(),
+            ]);
+        }
+    }
+
+    protected function processGetResult($response)
+    {
+        if ($response == null) {
+            return;
+        }
+
+        $responseHandler = $response->getObject();
+
+        if (!($responseHandler instanceof ResponseWrapper)) {
+            return;
+        }
+
+        $records = $responseHandler->getData();
+
+        foreach ($records as $record) {
+            if (!($record instanceof Record)) {
+                return;
+            }
+
+            $orderItems = $record->getKeyValue('Ordered_Items');
+
+            foreach ($orderItems as $orderItem) {
+                $record = new Record();
+                $record->addFieldValue(Products::id(), $orderItem->getKeyValue("id"));
+                $record->addFieldValue(new Field('_delete'), null);
+
+                $this->deletedItems[] = $record;
+            }
+        }
     }
 }

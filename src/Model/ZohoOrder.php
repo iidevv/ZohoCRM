@@ -36,6 +36,19 @@ class ZohoOrder extends AEntity
     protected $zoho_quote_id;
 
     /**
+     * @var float
+     *
+     * @ORM\Column (type="decimal", precision=14, scale=4)
+     */
+    protected $total = 0.0000;
+
+    /**
+     * @var boolean
+     * @ORM\Column(type="boolean")
+     */
+    protected $synced = true;
+
+    /**
      * @var boolean
      * @ORM\Column(type="boolean")
      */
@@ -77,6 +90,28 @@ class ZohoOrder extends AEntity
     public function setZohoQuoteId($zoho_quote_id): self
     {
         $this->zoho_quote_id = $zoho_quote_id;
+        return $this;
+    }
+
+    public function getTotal()
+    {
+        return $this->total;
+    }
+
+    public function setTotal($total): self
+    {
+        $this->total = $total;
+        return $this;
+    }
+
+    public function getSynced()
+    {
+        return $this->synced;
+    }
+
+    public function setSynced($synced): self
+    {
+        $this->synced = $synced;
         return $this;
     }
 

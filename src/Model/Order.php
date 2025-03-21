@@ -9,6 +9,8 @@ use Iidev\ZohoCRM\Core\ZohoAwareInterface;
 
 /**
  * @Extender\Mixin
+ * 
+ * @ORM\HasLifecycleCallbacks
  */
 class Order extends \XLite\Model\Order implements ZohoAwareInterface
 {
@@ -58,5 +60,17 @@ class Order extends \XLite\Model\Order implements ZohoAwareInterface
         }
 
         return true;
+    }
+
+    /**
+     * @ORM\PostUpdate
+     *
+     * @return void
+     */
+    public function processPostUpdate()
+    {
+        if ($this->zohoModel) {
+            $this->zohoModel->setSynced(false);
+        }
     }
 }
