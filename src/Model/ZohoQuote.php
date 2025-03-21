@@ -7,13 +7,13 @@ use XLite\Model\AEntity;
 
 /**
  * @ORM\Entity
- * @ORM\Table(name="zoho_orders", indexes={
+ * @ORM\Table(name="zoho_quotes", indexes={
  *          @ORM\Index (name="order_id", columns={"order_id"}),
  *          @ORM\Index(name="zoho_id", columns={"zoho_id"})
  *  }
  * )
  */
-class ZohoOrder extends AEntity
+class ZohoQuote extends AEntity
 {
     /**
      * @var \XLite\Model\Order
@@ -41,7 +41,7 @@ class ZohoOrder extends AEntity
      * @ORM\Column(type="boolean")
      */
     protected $synced = true;
-
+    
     /**
      * @var boolean
      * @ORM\Column(type="boolean")

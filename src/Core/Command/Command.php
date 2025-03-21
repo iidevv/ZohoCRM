@@ -43,7 +43,7 @@ class Command implements ICommand
         // Implement as needed
     }
 
-    protected function processCreateResult($modelClass, $response, $type = "")
+    protected function processCreateResult($modelClass, $response)
     {
         if ($response != null) {
             $actionHandler = $response->getObject();
@@ -52,10 +52,9 @@ class Command implements ICommand
 
                 $index = 0;
                 foreach ($actionResponses as $actionResponse) {
-                    /** @var ZohoAwareInterface $model */
                     $model = $this->entities[$index];
 
-                    $zohoModel = $model->getZohoModel();
+                    $zohoModel = $this->getZohoModel($model, $modelClass);
 
                     if (!$zohoModel) {
                         $zohoModel = new $modelClass();
@@ -68,12 +67,7 @@ class Command implements ICommand
                         if (isset($details['id'])) {
                             $zohoId = $details['id'];
 
-                            if ($type === 'quote') {
-                                $zohoModel->setZohoQuoteId($zohoId);
-                            } else {
-                                $zohoModel->setZohoId($zohoId);
-                            }
-
+                            $zohoModel->setZohoId($zohoId);
                         }
                     } elseif ($actionResponse instanceof APIException) {
                         $errors = [
@@ -84,7 +78,7 @@ class Command implements ICommand
                         $zohoModel->setSkipped(true);
                     }
 
-                    if ($zohoModel instanceof \Iidev\ZohoCRM\Model\ZohoOrder) {
+                    if (($zohoModel instanceof \Iidev\ZohoCRM\Model\ZohoOrder) || ($zohoModel instanceof \Iidev\ZohoCRM\Model\ZohoQuote)) {
                         $zohoModel->setTotal($model->getTotal());
                     }
 
@@ -97,7 +91,7 @@ class Command implements ICommand
         }
     }
 
-    protected function processUpdateResult($response, $type = "")
+    protected function processUpdateResult($modelClass, $response)
     {
         if ($response != null) {
             $actionHandler = $response->getObject();
@@ -106,18 +100,12 @@ class Command implements ICommand
 
                 $index = 0;
                 foreach ($actionResponses as $actionResponse) {
-                    /** @var ZohoAwareInterface $model */
                     $model = $this->entities[$index];
 
-                    $zohoModel = $model->getZohoModel();
+                    $zohoModel = $this->getZohoModel($model, $modelClass);
 
                     if ($actionResponse instanceof SuccessResponse) {
-                        if ($type === 'quote') {
-                            $zohoModel->setQuoteSynced(true);
-                        } else {
-                            $zohoModel->setSynced(true);
-                        }
-                        
+                        $zohoModel->setSynced(true);
                         $zohoModel->setErrors("");
 
                     } elseif ($actionResponse instanceof APIException) {
@@ -129,7 +117,7 @@ class Command implements ICommand
                         $zohoModel->setSkipped(true);
                     }
 
-                    if (($zohoModel instanceof \Iidev\ZohoCRM\Model\ZohoOrder) && $type !== 'quote') {
+                    if (($zohoModel instanceof \Iidev\ZohoCRM\Model\ZohoOrder) || ($zohoModel instanceof \Iidev\ZohoCRM\Model\ZohoQuote)) {
                         $zohoModel->setTotal($model->getTotal());
                     }
 
@@ -139,6 +127,20 @@ class Command implements ICommand
 
                 Database::getEM()->flush();
             }
+        }
+    }
+
+    protected function getZohoModel($model, $modelClass)
+    {
+        switch ($modelClass) {
+            case \Iidev\ZohoCRM\Model\ZohoOrder::class:
+                return $model->getZohoOrder();
+
+            case \Iidev\ZohoCRM\Model\ZohoQuote::class:
+                return $model->getZohoQuote();
+
+            default:
+                return $model->getZohoModel();
         }
     }
 

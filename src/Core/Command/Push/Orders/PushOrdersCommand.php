@@ -102,7 +102,7 @@ class PushOrdersCommand extends Command
             $record->addFieldValue(new Field('contactName'), $profile);
         }
 
-        $quoteId = $order->getZohoModel()?->getZohoQuoteId();
+        $quoteId = $order->getZohoQuote()?->getZohoId();
 
         if ($quoteId) {
             $quote = new Record();

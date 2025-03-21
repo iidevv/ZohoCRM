@@ -44,7 +44,7 @@ class UpdateOrdersCommand extends Command
             $headerInstance = new HeaderMap();
             $response = $recordOperations->updateRecords($bodyWrapper, $headerInstance);
 
-            $this->processUpdateResult($response);
+            $this->processUpdateResult(\Iidev\ZohoCRM\Model\ZohoOrder::class, $response);
         } catch (Exception $e) {
             $this->getLogger('ZohoCRM')->error('UpdateOrdersCommand Error:', [
                 'message' => $e->getMessage(),
@@ -55,7 +55,7 @@ class UpdateOrdersCommand extends Command
 
     protected function getOrder(Order $order)
     {
-        $zohoId = $order->getZohoModel()->getZohoId();
+        $zohoId = $order->getZohoOrder()?->getZohoId();
 
         $record = new Record();
 
@@ -95,7 +95,7 @@ class UpdateOrdersCommand extends Command
             $record->addFieldValue(new Field('contactName'), $profile);
         }
 
-        if ($order->getTotal() !== $order->getZohoModel()->getTotal()) {
+        if ($order->getTotal() !== $order->getZohoOrder()->getTotal()) {
             $this->getExistingLineItems($zohoId);
 
             $orderedProducts = array_merge($this->getOrderItems($order->getItems()), $this->deletedItems);

@@ -45,7 +45,7 @@ class PushQuotesCommand extends Command
             $headerInstance = new HeaderMap();
             $response = $recordOperations->createRecords($bodyWrapper, $headerInstance);
 
-            $this->processCreateResult(\Iidev\ZohoCRM\Model\ZohoOrder::class, $response, 'quote');
+            $this->processCreateResult(\Iidev\ZohoCRM\Model\ZohoQuote::class, $response);
         } catch (Exception $e) {
             $this->getLogger('ZohoCRM')->error('PushQuotesCommand Error:', [
                 'message' => $e->getMessage(),

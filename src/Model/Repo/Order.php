@@ -23,9 +23,9 @@ class Order extends \XLite\Model\Repo\Order
     protected function prepareCndZohoOrders(\Doctrine\ORM\QueryBuilder $queryBuilder, $value)
     {
         $queryBuilder
-            ->leftJoin('o.zohoModel', 'zm')
-            ->andWhere('zm.order_id IS NOT NULL')
-            ->andWhere('zm.errors != :emptyString')
+            ->leftJoin('o.zohoOrder', 'zo')
+            ->andWhere('zo.order_id IS NOT NULL')
+            ->andWhere('zo.errors != :emptyString')
             ->setParameter('emptyString', '');
     }
 
@@ -34,10 +34,11 @@ class Order extends \XLite\Model\Repo\Order
         $createOrdersFrom = (int) Config::getInstance()->Iidev->ZohoCRM->orders_from_number;
 
         $qb = $this->createQueryBuilder('o')
-            ->leftJoin('o.zohoModel', 'zm')
-            ->andWhere('o.payment_method_name != :paymentMethod OR zm.zoho_quote_id IS NOT NULL')
-            ->andWhere('zm.zoho_id IS NULL')
-            ->andWhere('zm.skipped = false OR zm.skipped IS NULL')
+            ->leftJoin('o.zohoOrder', 'zo')
+            ->leftJoin('o.zohoQuote', 'zq')
+            ->andWhere('o.payment_method_name != :paymentMethod OR zq.zoho_id IS NOT NULL')
+            ->andWhere('zo.zoho_id IS NULL')
+            ->andWhere('zo.skipped = false OR zo.skipped IS NULL')
             ->setParameter('paymentMethod', 'Quote')
             ->select('o.order_id')
             ->setMaxResults(30);
@@ -53,10 +54,10 @@ class Order extends \XLite\Model\Repo\Order
     public function findOrderIdsToUpdateInZoho()
     {
         return $this->createQueryBuilder('o')
-            ->leftJoin('o.zohoModel', 'zm')
-            ->andWhere('zm.zoho_id IS NOT NULL')
-            ->andWhere('zm.synced = false')
-            ->andWhere('zm.skipped = false OR zm.skipped IS NULL')
+            ->leftJoin('o.zohoOrder', 'zo')
+            ->andWhere('zo.zoho_id IS NOT NULL')
+            ->andWhere('zo.synced = false')
+            ->andWhere('zo.skipped = false OR zo.skipped IS NULL')
             ->select('o.order_id')
             ->setMaxResults(30)
             ->getQuery()
@@ -68,11 +69,10 @@ class Order extends \XLite\Model\Repo\Order
         $createOrdersFrom = (int) Config::getInstance()->Iidev->ZohoCRM->orders_from_number;
 
         $qb = $this->createQueryBuilder('o')
-            ->leftJoin('o.zohoModel', 'zm')
+            ->leftJoin('o.zohoQuote', 'zq')
             ->andWhere('o.payment_method_name = :paymentMethod')
-            ->andWhere('zm.zoho_quote_id IS NULL')
-            ->andWhere('zm.zoho_id IS NULL')
-            ->andWhere('zm.skipped = false OR zm.skipped IS NULL')
+            ->andWhere('zq.zoho_id IS NULL')
+            ->andWhere('zq.skipped = false OR zq.skipped IS NULL')
             ->setParameter('paymentMethod', 'Quote')
             ->select('o.order_id')
             ->setMaxResults(30);
@@ -88,10 +88,10 @@ class Order extends \XLite\Model\Repo\Order
     public function findQuoteIdsToUpdateInZoho()
     {
         return $this->createQueryBuilder('o')
-            ->leftJoin('o.zohoModel', 'zm')
-            ->andWhere('zm.zoho_quote_id IS NOT NULL')
-            ->andWhere('zm.quote_synced = false')
-            ->andWhere('zm.skipped = false OR zm.skipped IS NULL')
+            ->leftJoin('o.zohoQuote', 'zq')
+            ->andWhere('zq.zoho_id IS NOT NULL')
+            ->andWhere('zq.synced = false')
+            ->andWhere('zq.skipped = false OR zq.skipped IS NULL')
             ->select('o.order_id')
             ->setMaxResults(30)
             ->getQuery()

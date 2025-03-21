@@ -36,7 +36,7 @@ class UpdateProductVariantsCommand extends Command
             $headerInstance = new HeaderMap();
             $response = $recordOperations->updateRecords($bodyWrapper, $headerInstance);
 
-            $this->processUpdateResult($response);
+            $this->processUpdateResult(\Iidev\ZohoCRM\Model\ZohoProductVariant::class,$response);
         } catch (Exception $e) {
             $this->getLogger('ZohoCRM')->error('UpdateProductVariantsCommand Error:', [
                 'message' => $e->getMessage(),

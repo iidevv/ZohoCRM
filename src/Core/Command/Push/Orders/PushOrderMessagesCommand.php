@@ -98,7 +98,7 @@ class PushOrderMessagesCommand extends Command
             $record->addFieldValue(new Field('contactName'), $profile);
         }
 
-        $orderId = $message->getConversation()?->getOrder()?->getZohoModel()?->getZohoId();
+        $orderId = $message->getConversation()?->getOrder()?->getZohoOrder()?->getZohoId();
 
         if ($orderId) {
             $order = new Record();

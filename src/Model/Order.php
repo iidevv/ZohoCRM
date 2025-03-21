@@ -5,37 +5,76 @@ namespace Iidev\ZohoCRM\Model;
 use Doctrine\ORM\Mapping as ORM;
 
 use XCart\Extender\Mapping\Extender;
-use Iidev\ZohoCRM\Core\ZohoAwareInterface;
-
+use XLite\InjectLoggerTrait;
 /**
  * @Extender\Mixin
  * 
  * @ORM\HasLifecycleCallbacks
  */
-class Order extends \XLite\Model\Order implements ZohoAwareInterface
+class Order extends \XLite\Model\Order
 {
+    use InjectLoggerTrait;
+
     /**
      * @var \Iidev\ZohoCRM\Model\ZohoOrder
      *
      * @ORM\OneToOne(targetEntity="Iidev\ZohoCRM\Model\ZohoOrder", mappedBy="order_id", cascade={"merge", "detach", "persist"})
      */
-    protected $zohoModel;
+    protected $zohoOrder;
+
+    /**
+     * @var \Iidev\ZohoCRM\Model\ZohoQuote
+     * @ORM\OneToOne(targetEntity="Iidev\ZohoCRM\Model\ZohoQuote", mappedBy="order_id", cascade={"merge", "detach", "persist"})
+     */
+    protected $zohoQuote;
 
     /**
      * @return \Iidev\ZohoCRM\Model\ZohoOrder|null
      */
-    public function getZohoModel()
+    public function getZohoOrder()
     {
-        return $this->zohoModel;
+        return $this->zohoOrder;
     }
 
     /**
-     * @param \Iidev\ZohoCRM\Model\ZohoOrder|null $zohoModel
+     * @param \Iidev\ZohoCRM\Model\ZohoOrder|null $zohoOrder
+     * @return self
+     */
+    public function setZohoOrder($zohoOrder): self
+    {
+        $this->zohoOrder = $zohoOrder;
+        return $this;
+    }
+
+    /**
+     * @return \Iidev\ZohoCRM\Model\ZohoQuote|null
+     */
+    public function getZohoQuote()
+    {
+        return $this->zohoQuote;
+    }
+
+    /**
+     * @param \Iidev\ZohoCRM\Model\ZohoQuote|null $zohoQuote
+     * @return self
+     */
+    public function setZohoQuote($zohoQuote): self
+    {
+        $this->zohoQuote = $zohoQuote;
+        return $this;
+    }
+
+    /**
+     * @param mixed $zohoModel
      * @return self
      */
     public function setZohoModel($zohoModel): self
     {
-        $this->zohoModel = $zohoModel;
+        if ($zohoModel instanceof \Iidev\ZohoCRM\Model\ZohoOrder) {
+            $this->zohoOrder = $zohoModel;
+        } elseif ($zohoModel instanceof \Iidev\ZohoCRM\Model\ZohoQuote) {
+            $this->zohoQuote = $zohoModel;
+        }
         return $this;
     }
 
@@ -44,10 +83,14 @@ class Order extends \XLite\Model\Order implements ZohoAwareInterface
      */
     public function getDecodedZohoErrors()
     {
-        if ($this->zohoModel && $this->zohoModel->getErrors()) {
-            return json_decode($this->zohoModel->getErrors(), true) ?: [];
+        $errors = [];
+        if ($this->zohoOrder && $this->zohoOrder->getErrors()) {
+            $errors['order'] = json_decode($this->zohoOrder->getErrors(), true) ?: [];
         }
-        return null;
+        if ($this->zohoQuote && $this->zohoQuote->getErrors()) {
+            $errors['quote'] = json_decode($this->zohoQuote->getErrors(), true) ?: [];
+        }
+        return $errors ?: null;
     }
 
     /**
@@ -55,11 +98,7 @@ class Order extends \XLite\Model\Order implements ZohoAwareInterface
      */
     public function isSkipped()
     {
-        if ($this->zohoModel) {
-            return $this->zohoModel->getSkipped();
-        }
-
-        return true;
+        return (!$this->zohoOrder || $this->zohoOrder->getSkipped()) && (!$this->zohoQuote || $this->zohoQuote->getSkipped());
     }
 
     /**
@@ -69,12 +108,11 @@ class Order extends \XLite\Model\Order implements ZohoAwareInterface
      */
     public function processPostUpdate()
     {
-        if ($this->zohoModel) {
-            $this->zohoModel->setSynced(false);
+        if ($this->zohoOrder) {
+            $this->zohoOrder->setSynced(false);
         }
-
-        if ($this->getZohoModel()?->getZohoQuoteId()) {
-            $this->zohoModel->setQuoteSynced(false);
+        if ($this->zohoQuote) {
+            $this->zohoQuote->setSynced(false);
         }
     }
 }

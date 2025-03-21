@@ -44,7 +44,7 @@ class UpdateQuotesCommand extends Command
             $headerInstance = new HeaderMap();
             $response = $recordOperations->updateRecords($bodyWrapper, $headerInstance);
 
-            $this->processUpdateResult($response, 'quote');
+            $this->processUpdateResult(\Iidev\ZohoCRM\Model\ZohoQuote::class, $response);
         } catch (Exception $e) {
             $this->getLogger('ZohoCRM')->error('UpdateQuotesCommand Error:', [
                 'message' => $e->getMessage(),
@@ -55,7 +55,7 @@ class UpdateQuotesCommand extends Command
 
     protected function getOrder(Order $order)
     {
-        $zohoId = $order->getZohoModel()->getZohoQuoteId();
+        $zohoId = $order->getZohoQuote()->getZohoId();
 
         $record = new Record();
 
@@ -94,20 +94,22 @@ class UpdateQuotesCommand extends Command
             $record->addFieldValue(Quotes::ContactName(), $profile);
         }
 
-        $this->getExistingLineItems($zohoId);
+        if ($order->getTotal() !== $order->getZohoQuote()->getTotal()) {
+            $this->getExistingLineItems($zohoId);
 
-        $orderedProducts = array_merge($this->getOrderItems($order->getItems()), $this->deletedItems);
+            $orderedProducts = array_merge($this->getOrderItems($order->getItems()), $this->deletedItems);
 
-        $record->addFieldValue(Quotes::QuotedItems(), $orderedProducts);
+            $record->addFieldValue(Quotes::QuotedItems(), $orderedProducts);
 
-        $discount = $order->getSurchargeSumByType(Surcharge::TYPE_DISCOUNT);
-        $record->addFieldValue(Quotes::Discount(), (double) abs($discount));
+            $discount = $order->getSurchargeSumByType(Surcharge::TYPE_DISCOUNT);
+            $record->addFieldValue(Quotes::Discount(), (double) abs($discount));
 
-        $tax = $order->getSurchargeSumByType(Surcharge::TYPE_TAX);
-        $shipping = $order->getSurchargeSumByType(Surcharge::TYPE_SHIPPING);
-        $adjustment = $shipping + $tax;
+            $tax = $order->getSurchargeSumByType(Surcharge::TYPE_TAX);
+            $shipping = $order->getSurchargeSumByType(Surcharge::TYPE_SHIPPING);
+            $adjustment = $shipping + $tax;
 
-        $record->addFieldValue(Quotes::Adjustment(), (double) $adjustment);
+            $record->addFieldValue(Quotes::Adjustment(), (double) $adjustment);
+        }
 
         return $record;
     }
@@ -132,7 +134,7 @@ class UpdateQuotesCommand extends Command
     }
 
     protected function processGetResult($response)
-    {   
+    {
         if ($response == null) {
             return;
         }

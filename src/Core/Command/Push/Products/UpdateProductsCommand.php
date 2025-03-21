@@ -36,7 +36,7 @@ class UpdateProductsCommand extends Command
             $headerInstance = new HeaderMap();
             $response = $recordOperations->updateRecords($bodyWrapper, $headerInstance);
 
-            $this->processUpdateResult($response);
+            $this->processUpdateResult(\Iidev\ZohoCRM\Model\ZohoProduct::class, $response);
         } catch (Exception $e) {
             $this->getLogger('ZohoCRM')->error('UpdateProductsCommand Error:', [
                 'message' => $e->getMessage(),
