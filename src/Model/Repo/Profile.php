@@ -41,4 +41,17 @@ class Profile extends \XLite\Model\Repo\Profile
             ->getQuery()
             ->getSingleColumnResult();
     }
+
+    public function findProfileIdsToUpdateInZoho()
+    {
+        return $this->createQueryBuilder('p')
+            ->leftJoin('p.zohoModel', 'zm')
+            ->andWhere('zm.zoho_id IS NOT NULL')
+            ->andWhere('zm.synced = false')
+            ->andWhere('zm.skipped = false OR zm.skipped IS NULL')
+            ->select('p.profile_id')
+            ->setMaxResults(30)
+            ->getQuery()
+            ->getSingleColumnResult();
+    }
 }

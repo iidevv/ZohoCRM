@@ -32,6 +32,12 @@ class ZohoProfile extends AEntity
     protected $skipped = false;
 
     /**
+     * @var boolean
+     * @ORM\Column(type="boolean")
+     */
+    protected $synced = true;
+
+    /**
      * @var string
      * @ORM\Column(type="text")
      */
@@ -79,5 +85,16 @@ class ZohoProfile extends AEntity
     public function getErrors()
     {
         return $this->errors;
+    }
+
+    public function getSynced()
+    {
+        return $this->synced;
+    }
+
+    public function setSynced($synced): self
+    {
+        $this->synced = $synced;
+        return $this;
     }
 }

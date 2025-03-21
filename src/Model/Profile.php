@@ -9,6 +9,7 @@ use Iidev\ZohoCRM\Core\ZohoAwareInterface;
 
 /**
  * @Extender\Mixin
+ * @ORM\HasLifecycleCallbacks
  */
 class Profile extends \XLite\Model\Profile implements ZohoAwareInterface
 {
@@ -58,5 +59,23 @@ class Profile extends \XLite\Model\Profile implements ZohoAwareInterface
         }
 
         return true;
+    }
+
+    /**
+     * @ORM\PostUpdate
+     *
+     * @return void
+     */
+    public function processPostUpdate()
+    {
+        $changeSet = \XLite\Core\Database::getEM()->getUnitOfWork()->getEntityChangeSet($this);
+        
+        if (!isset($changeSet['login']) && !isset($changeSet['membership'])) {
+            return;
+        }
+
+        if ($this->zohoModel) {
+            $this->zohoModel->setSynced(false);
+        }
     }
 }
