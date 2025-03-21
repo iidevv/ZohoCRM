@@ -36,10 +36,10 @@ class ZohoProductVariant extends AEntity
     protected $skipped = false;
 
     /**
-     * @var string
-     * @ORM\Column (type="integer", options={ "unsigned": true })
+     * @var boolean
+     * @ORM\Column(type="boolean")
      */
-    protected $last_synced = 0;
+    protected $synced = true;
 
     /**
      * @var string
@@ -91,15 +91,14 @@ class ZohoProductVariant extends AEntity
         return $this->errors;
     }
 
-    public function getLastSynced()
+    public function getSynced()
     {
-        return $this->last_synced;
+        return $this->synced;
     }
 
-    public function setLastSynced($last_synced): self
+    public function setSynced($synced): self
     {
-        $this->last_synced = $last_synced;
-
+        $this->synced = $synced;
         return $this;
     }
 }

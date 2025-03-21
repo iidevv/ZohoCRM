@@ -68,12 +68,14 @@ class PushProductVariantsCommand extends Command
     {
         $product = $variant->getProduct();
 
+        $price = $variant->getDefaultPrice() ? $product->getPrice() : $variant->getPrice();
+
         $record = new Record();
 
         $record->addFieldValue(Products::ProductName(), $this->getVariantTitle($variant));
         $record->addFieldValue(Products::ProductCode(), $variant->getSku());
         $record->addFieldValue(Products::QtyInStock(), (double) $variant->getAmount());
-        $record->addFieldValue(Products::UnitPrice(), $variant->getPrice());
+        $record->addFieldValue(Products::UnitPrice(), $price);
         $record->addFieldValue(Products::Tax(), 0);
         $record->addFieldValue(Products::Description(), Main::getFormattedDescription($product->getBriefDescription()));
         $record->addFieldValue(Products::ProductActive(), true);

@@ -37,14 +37,13 @@ class ProductVariant extends \XC\ProductVariants\Model\Repo\ProductVariant
             ->getQuery()->getSingleColumnResult();
     }
 
-    public function findVariantIdsToSyncInZoho()
+    public function findVariantIdsToUpdateInZoho()
     {
         return $this->createQueryBuilder('v')
             ->leftJoin('v.zohoModel', 'zm')
             ->andWhere('zm.zoho_id IS NOT NULL')
-            ->andWhere('zm.last_synced < :timeLimit')
-            ->setParameter('timeLimit', time() - 3600)
-            ->orderBy('zm.last_synced', 'DESC')
+            ->andWhere('zm.synced = false')
+            ->andWhere('zm.skipped = false OR zm.skipped IS NULL')
             ->select('v.id')
             ->setMaxResults(30)
             ->getQuery()->getSingleColumnResult();

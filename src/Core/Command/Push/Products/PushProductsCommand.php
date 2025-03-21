@@ -51,6 +51,7 @@ class PushProductsCommand extends Command
 
     protected function getProducts()
     {
+        $shouldFlush = false;
         $records = [];
         $products = Database::getRepo(Product::class)->findByIds($this->entityIds);
 
@@ -62,8 +63,12 @@ class PushProductsCommand extends Command
                 $this->setSkipProduct($product);
 
                 Database::getEM()->persist($product);
-                Database::getEM()->flush();
+                $shouldFlush = true;
             }
+        }
+
+        if ($shouldFlush) {
+            Database::getEM()->flush();
         }
 
         return $records;

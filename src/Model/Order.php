@@ -5,16 +5,13 @@ namespace Iidev\ZohoCRM\Model;
 use Doctrine\ORM\Mapping as ORM;
 
 use XCart\Extender\Mapping\Extender;
-use XLite\InjectLoggerTrait;
+
 /**
  * @Extender\Mixin
- * 
  * @ORM\HasLifecycleCallbacks
  */
 class Order extends \XLite\Model\Order
 {
-    use InjectLoggerTrait;
-
     /**
      * @var \Iidev\ZohoCRM\Model\ZohoOrder
      *
@@ -108,6 +105,8 @@ class Order extends \XLite\Model\Order
      */
     public function processPostUpdate()
     {
+        parent::processPostUpdate();
+
         if ($this->zohoOrder) {
             $this->zohoOrder->setSynced(false);
         }

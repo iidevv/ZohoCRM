@@ -9,6 +9,7 @@ use Iidev\ZohoCRM\Core\ZohoAwareInterface;
 
 /**
  * @Extender\Mixin
+ * @ORM\HasLifecycleCallbacks
  */
 class ProductVariant extends \XC\ProductVariants\Model\ProductVariant implements ZohoAwareInterface
 {
@@ -58,5 +59,17 @@ class ProductVariant extends \XC\ProductVariants\Model\ProductVariant implements
         }
 
         return true;
+    }
+
+    /**
+     * @ORM\PostUpdate
+     */
+    public function processPostUpdate()
+    {
+        parent::processPostUpdate();
+
+        if ($this->zohoModel) {
+            $this->zohoModel->setSynced(false);
+        }
     }
 }

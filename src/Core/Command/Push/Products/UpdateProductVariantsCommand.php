@@ -36,7 +36,7 @@ class UpdateProductVariantsCommand extends Command
             $headerInstance = new HeaderMap();
             $response = $recordOperations->updateRecords($bodyWrapper, $headerInstance);
 
-            $this->processUpdateResult(\Iidev\ZohoCRM\Model\ZohoProductVariant::class,$response);
+            $this->processUpdateResult(\Iidev\ZohoCRM\Model\ZohoProductVariant::class, $response);
         } catch (Exception $e) {
             $this->getLogger('ZohoCRM')->error('UpdateProductVariantsCommand Error:', [
                 'message' => $e->getMessage(),
@@ -62,10 +62,13 @@ class UpdateProductVariantsCommand extends Command
     {
         $record = new Record();
 
-        $record->addFieldValue(Products::id(), $variant->getZohoId());
+        $product = $variant->getProduct();
+        $price = $variant->getDefaultPrice() ? $product->getPrice() : $variant->getPrice();
+
+        $record->addFieldValue(Products::id(), $variant->getZohoModel()->getZohoId());
         $record->addFieldValue(Products::ProductCode(), $variant->getSku());
         $record->addFieldValue(Products::QtyInStock(), (double) $variant->getAmount());
-        $record->addFieldValue(Products::UnitPrice(), $variant->getPrice());
+        $record->addFieldValue(Products::UnitPrice(), $price);
 
         return $record;
     }

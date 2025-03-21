@@ -6,9 +6,11 @@ use Doctrine\ORM\Mapping as ORM;
 
 use XCart\Extender\Mapping\Extender;
 use Iidev\ZohoCRM\Core\ZohoAwareInterface;
+use function PHPUnit\Framework\returnArgument;
 
 /**
  * @Extender\Mixin
+ * @ORM\HasLifecycleCallbacks
  */
 class Product extends \XLite\Model\Product implements ZohoAwareInterface
 {
@@ -58,5 +60,31 @@ class Product extends \XLite\Model\Product implements ZohoAwareInterface
         }
 
         return true;
+    }
+
+    /**
+     * @ORM\PostUpdate
+     */
+    public function processPostUpdate()
+    {
+        parent::processPostUpdate();
+
+        $changeSet = \XLite\Core\Database::getEM()->getUnitOfWork()->getEntityChangeSet($this);
+
+        if (isset($changeSet['price']) && $this->hasVariants()) {
+            $this->setZohoVariantsNotSynced($this->getVariants());
+        } else if ($this->zohoModel) {
+            $this->zohoModel->setSynced(false);
+        }
+    }
+
+    protected function setZohoVariantsNotSynced($variants)
+    {
+        foreach ($variants as $variant) {
+            if (!$variant->getZohoModel())
+                return;
+
+            $variant->getZohoModel()->setSynced(false);
+        }
     }
 }

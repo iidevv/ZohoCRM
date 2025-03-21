@@ -14,7 +14,7 @@ class UpdateProductVariantsDispatcher
     
     public function __construct()
     {
-        $entityIds = Database::getRepo(ProductVariant::class)->findVariantIdsToSyncInZoho();
+        $entityIds = Database::getRepo(ProductVariant::class)->findVariantIdsToUpdateInZoho();
 
         /** @var UpdateProductVariantsCommandFactory $commandFactory */
         $commandFactory = Container::getContainer() ? Container::getContainer()->get(UpdateProductVariantsCommandFactory::class) : null;

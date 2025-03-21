@@ -40,16 +40,15 @@ class Product extends \XLite\Model\Repo\Product
             ->getQuery()->getSingleColumnResult();
     }
 
-    public function findProductIdsToSyncInZoho()
+    public function findProductIdsToUpdateInZoho()
     {
         return $this->createQueryBuilder('p')
             ->leftJoin('p.zohoModel', 'zm')
             ->andWhere('p.enabled = :enabled')
             ->andWhere('zm.zoho_id IS NOT NULL')
-            ->andWhere('zm.last_synced < :timeLimit')
+            ->andWhere('zm.synced = false')
+            ->andWhere('zm.skipped = false OR zm.skipped IS NULL')
             ->setParameter('enabled', 1)
-            ->setParameter('timeLimit', time() - 3600)
-            ->orderBy('zm.last_synced', 'DESC')
             ->select('p.product_id')
             ->setMaxResults(30)
             ->getQuery()->getSingleColumnResult();

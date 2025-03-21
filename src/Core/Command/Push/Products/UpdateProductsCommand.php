@@ -51,9 +51,7 @@ class UpdateProductsCommand extends Command
         $this->entities = Database::getRepo(Product::class)->findByIds($this->entityIds);
 
         foreach ($this->entities as $product) {
-            if ($product->hasVariants()) {
-                $records = array_merge($records, $this->getVariants($product));
-            } else {
+            if (!$product->hasVariants()) {
                 $records[] = $this->getProduct($product);
             }
         }
@@ -65,30 +63,11 @@ class UpdateProductsCommand extends Command
     {
         $record = new Record();
 
-        $record->addFieldValue(Products::id(), $product->getZohoId());
+        $record->addFieldValue(Products::id(), $product->getZohoModel()->getZohoId());
         $record->addFieldValue(Products::ProductCode(), $product->getSku());
         $record->addFieldValue(Products::QtyInStock(), (double) $product->getAmount());
         $record->addFieldValue(Products::UnitPrice(), $product->getPrice());
 
         return $record;
-    }
-
-    protected function getVariants(Product $product)
-    {
-        $records = [];
-        $variants = $product->getVariants();
-
-        foreach ($variants as $variant) {
-            $record = new Record();
-
-            $record->addFieldValue(Products::id(), $variant->getZohoId());
-            $record->addFieldValue(Products::ProductCode(), $variant->getSku());
-            $record->addFieldValue(Products::QtyInStock(), (double) $variant->getAmount());
-            $record->addFieldValue(Products::UnitPrice(), $variant->getPrice());
-
-            $records[] = $record;
-        }
-
-        return $records;
     }
 }
