@@ -2,26 +2,25 @@
 
 namespace Iidev\ZohoCRM\Core\Command\Push\Quotes;
 
+use com\zoho\crm\api\record\GetRecordsParam;
 use Exception;
 use Iidev\ZohoCRM\Core\Command\Command;
-use XLite\Core\Database;
 use XLite\Model\Order;
-use XLite\Core\Config;
+use XLite\Model\Base\Surcharge;
 use com\zoho\crm\api\HeaderMap;
 use com\zoho\crm\api\record\RecordOperations;
 use com\zoho\crm\api\record\BodyWrapper;
 use com\zoho\crm\api\record\Quotes;
-use com\zoho\crm\api\record\LineItemProduct;
-use com\zoho\crm\api\record\Products;
 use com\zoho\crm\api\record\Record;
-use com\zoho\crm\api\users\MinifiedUser;
 use com\zoho\crm\api\record\Field;
 use com\zoho\crm\api\util\Choice;
-use XLite\Model\Base\Surcharge;
-use \XLite\Model\OrderItem;
+use com\zoho\crm\api\ParameterMap;
+use com\zoho\crm\api\record\Products;
+use com\zoho\crm\api\record\ResponseWrapper;
 
-class PushQuotesCommand extends Command
+class UpdateQuotesCommand extends Command
 {
+    protected array $deletedItems = [];
 
     public function __construct(
         array $entityIds
@@ -43,11 +42,11 @@ class PushQuotesCommand extends Command
 
             $bodyWrapper->setData($records);
             $headerInstance = new HeaderMap();
-            $response = $recordOperations->createRecords($bodyWrapper, $headerInstance);
+            $response = $recordOperations->updateRecords($bodyWrapper, $headerInstance);
 
-            $this->processCreateResult(\Iidev\ZohoCRM\Model\ZohoOrder::class, $response, 'quote');
+            $this->processUpdateResult($response, 'quote');
         } catch (Exception $e) {
-            $this->getLogger('ZohoCRM')->error('PushQuotesCommand Error:', [
+            $this->getLogger('ZohoCRM')->error('UpdateQuotesCommand Error:', [
                 'message' => $e->getMessage(),
                 'trace' => $e->getTrace(),
             ]);
@@ -56,15 +55,13 @@ class PushQuotesCommand extends Command
 
     protected function getOrder(Order $order)
     {
+        $zohoId = $order->getZohoModel()->getZohoQuoteId();
+
         $record = new Record();
 
-        $date = new \DateTime('@' . $order->getDate());
-        $record->addFieldValue(new Field('placedOn'), $date);
+        $record->addFieldValue(Quotes::id(), $zohoId);
 
         $record->addFieldValue(Quotes::QuoteStage(), new Choice($this->getQuoteStage($order)));
-
-        $record->addFieldValue(Quotes::Subject(), "#{$order->getOrderNumber()}");
-        $record->addFieldValue(Quotes::QuotedItems(), $this->getOrderItems($order->getItems()));
 
         $shippingAddress = $order->getProfile()->getShippingAddress();
         $billingAddress = $order->getProfile()->getBillingAddress();
@@ -85,15 +82,6 @@ class PushQuotesCommand extends Command
         $record->addFieldValue(Quotes::BillingCode(), $billingAddress->getZipcode());
         $record->addFieldValue(new Field('billingPhone'), $billingAddress->getPhone());
 
-        $discount = $order->getSurchargeSumByType(Surcharge::TYPE_DISCOUNT);
-        $record->addFieldValue(Quotes::Discount(), (double) abs($discount));
-
-        $tax = $order->getSurchargeSumByType(Surcharge::TYPE_TAX);
-        $shipping = $order->getSurchargeSumByType(Surcharge::TYPE_SHIPPING);
-        $adjustment = $shipping + $tax;
-
-        $record->addFieldValue(Quotes::Adjustment(), (double) $adjustment);
-
         $record->addFieldValue(new Field('customerNotes'), $order->getNotes());
 
         $record->addFieldValue(new Field('staffNotes'), $order->getAdminNotes());
@@ -106,11 +94,71 @@ class PushQuotesCommand extends Command
             $record->addFieldValue(Quotes::ContactName(), $profile);
         }
 
-        $owner = new MinifiedUser();
-        $owner->setId(Config::getInstance()->Iidev->ZohoCRM->owner_id);
+        $this->getExistingLineItems($zohoId);
 
-        $record->addFieldValue(Quotes::Owner(), $owner);
+        $orderedProducts = array_merge($this->getOrderItems($order->getItems()), $this->deletedItems);
+
+        $record->addFieldValue(Quotes::QuotedItems(), $orderedProducts);
+
+        $discount = $order->getSurchargeSumByType(Surcharge::TYPE_DISCOUNT);
+        $record->addFieldValue(Quotes::Discount(), (double) abs($discount));
+
+        $tax = $order->getSurchargeSumByType(Surcharge::TYPE_TAX);
+        $shipping = $order->getSurchargeSumByType(Surcharge::TYPE_SHIPPING);
+        $adjustment = $shipping + $tax;
+
+        $record->addFieldValue(Quotes::Adjustment(), (double) $adjustment);
 
         return $record;
+    }
+
+    protected function getExistingLineItems(string $recordId): void
+    {
+        $recordOperations = new RecordOperations('Quotes');
+        $headerInstance = new HeaderMap();
+        $paramInstance = new ParameterMap();
+        $paramInstance->add(GetRecordsParam::fields(), "Quoted_Items");
+
+        try {
+            $response = $recordOperations->getRecord($recordId, $paramInstance, $headerInstance);
+            $this->processGetResult($response);
+        } catch (Exception $e) {
+            $this->getLogger('ZohoCRM')->error('Error get existing line items', [
+                'record_id' => $recordId,
+                'code' => $e->getCode(),
+                'message' => $e->getMessage(),
+            ]);
+        }
+    }
+
+    protected function processGetResult($response)
+    {   
+        if ($response == null) {
+            return;
+        }
+
+        $responseHandler = $response->getObject();
+
+        if (!($responseHandler instanceof ResponseWrapper)) {
+            return;
+        }
+
+        $records = $responseHandler->getData();
+
+        foreach ($records as $record) {
+            if (!($record instanceof Record)) {
+                return;
+            }
+
+            $orderItems = $record->getKeyValue('Quoted_Items');
+
+            foreach ($orderItems as $orderItem) {
+                $record = new Record();
+                $record->addFieldValue(Products::id(), $orderItem->getKeyValue("id"));
+                $record->addFieldValue(new Field('_delete'), null);
+
+                $this->deletedItems[] = $record;
+            }
+        }
     }
 }

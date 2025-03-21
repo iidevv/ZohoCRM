@@ -21,6 +21,9 @@ class Command implements ICommand
 {
     use InjectLoggerTrait;
 
+    public const QUOTE_CLOSED_WON = 'Closed Won';
+    public const QUOTE_CLOSED_LOST = 'Closed Lost';
+    public const QUOTE_ON_HOLD = 'On Hold';
     protected array $entityIds;
     protected array $entities = [];
 
@@ -114,6 +117,9 @@ class Command implements ICommand
                         } else {
                             $zohoModel->setSynced(true);
                         }
+                        
+                        $zohoModel->setErrors("");
+
                     } elseif ($actionResponse instanceof APIException) {
                         $errors = [
                             "message" => $actionResponse->getMessage() instanceof Choice ? $actionResponse->getMessage()->getValue() : $actionResponse->getMessage(),
@@ -123,7 +129,7 @@ class Command implements ICommand
                         $zohoModel->setSkipped(true);
                     }
 
-                    if ($zohoModel instanceof \Iidev\ZohoCRM\Model\ZohoOrder) {
+                    if (($zohoModel instanceof \Iidev\ZohoCRM\Model\ZohoOrder) && $type !== 'quote') {
                         $zohoModel->setTotal($model->getTotal());
                     }
 
@@ -180,5 +186,20 @@ class Command implements ICommand
         $record->addFieldValue(new Field('Quantity'), (double) $orderItem->getAmount());
 
         return $record;
+    }
+
+    protected function getQuoteStage(Order $order)
+    {
+        $paymentStatus = $order->getPaymentStatus()?->getCode();
+
+        if ($paymentStatus === \XLite\Model\Order\Status\Payment::STATUS_QUEUED || $paymentStatus === \XLite\Model\Order\Status\Payment::STATUS_AUTHORIZED) {
+            return static::QUOTE_ON_HOLD;
+        }
+
+        if ($paymentStatus === \XLite\Model\Order\Status\Payment::STATUS_PAID || $paymentStatus === \XLite\Model\Order\Status\Payment::STATUS_PART_PAID) {
+            return static::QUOTE_CLOSED_WON;
+        }
+
+        return static::QUOTE_CLOSED_LOST;
     }
 }

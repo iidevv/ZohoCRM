@@ -17,7 +17,7 @@ services:
     tags:
       - name: messenger.message_handler
         handles: Iidev\ZohoCRM\Messenger\Message\ExportMessage
-  
+
   # Dispatcher
 
   Iidev\ZohoCRM\Core\Dispatcher\Products\CreateProductsDispatcher: ~
@@ -32,6 +32,7 @@ services:
   Iidev\ZohoCRM\Core\Dispatcher\Orders\CreateOrderMessagesDispatcher: ~
 
   Iidev\ZohoCRM\Core\Dispatcher\Quotes\CreateQuotesDispatcher: ~
+  Iidev\ZohoCRM\Core\Dispatcher\Quotes\UpdateQuotesDispatcher: ~
 
   # CommandFactory
 
@@ -47,6 +48,7 @@ services:
   Iidev\ZohoCRM\Core\Factory\Commands\Orders\PushOrderMessagesCommandFactory:
 
   Iidev\ZohoCRM\Core\Factory\Commands\Quotes\PushQuotesCommandFactory:
+  Iidev\ZohoCRM\Core\Factory\Commands\Quotes\UpdateQuotesCommandFactory:
 
   # Task
 
@@ -81,7 +83,7 @@ services:
           event: xcart.cronjob,
           method: handleTask,
         }
-  
+
   Iidev\ZohoCRM\Core\Task\Orders\UpdateOrders:
     tags:
       - {
@@ -89,7 +91,7 @@ services:
           event: xcart.cronjob,
           method: handleTask,
         }
-  
+
   Iidev\ZohoCRM\Core\Task\Orders\CreateOrderMessages:
     tags:
       - {
@@ -97,8 +99,16 @@ services:
           event: xcart.cronjob,
           method: handleTask,
         }
-  
+
   Iidev\ZohoCRM\Core\Task\Quotes\CreateQuotes:
+    tags:
+      - {
+          name: kernel.event_listener,
+          event: xcart.cronjob,
+          method: handleTask,
+        }
+
+  Iidev\ZohoCRM\Core\Task\Quotes\UpdateQuotes:
     tags:
       - {
           name: kernel.event_listener,
@@ -131,15 +141,19 @@ services:
   Iidev\ZohoCRM\Command\Orders\CreateOrdersCommand:
     tags:
       - { name: "console.command", command: "ZohoCRM:CreateOrders" }
-  
+
   Iidev\ZohoCRM\Command\Orders\UpdateOrdersCommand:
     tags:
       - { name: "console.command", command: "ZohoCRM:UpdateOrders" }
-  
+
   Iidev\ZohoCRM\Command\Orders\CreateOrderMessagesCommand:
     tags:
       - { name: "console.command", command: "ZohoCRM:CreateOrderMessages" }
-  
+
   Iidev\ZohoCRM\Command\Quotes\CreateQuotesCommand:
     tags:
       - { name: "console.command", command: "ZohoCRM:CreateQuotes" }
+
+  Iidev\ZohoCRM\Command\Quotes\UpdateQuotesCommand:
+    tags:
+      - { name: "console.command", command: "ZohoCRM:UpdateQuotes" }

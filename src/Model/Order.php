@@ -72,5 +72,9 @@ class Order extends \XLite\Model\Order implements ZohoAwareInterface
         if ($this->zohoModel) {
             $this->zohoModel->setSynced(false);
         }
+
+        if ($this->getZohoModel()?->getZohoQuoteId()) {
+            $this->zohoModel->setQuoteSynced(false);
+        }
     }
 }

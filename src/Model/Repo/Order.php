@@ -84,4 +84,17 @@ class Order extends \XLite\Model\Repo\Order
 
         return $qb->getQuery()->getSingleColumnResult();
     }
+
+    public function findQuoteIdsToUpdateInZoho()
+    {
+        return $this->createQueryBuilder('o')
+            ->leftJoin('o.zohoModel', 'zm')
+            ->andWhere('zm.zoho_quote_id IS NOT NULL')
+            ->andWhere('zm.quote_synced = false')
+            ->andWhere('zm.skipped = false OR zm.skipped IS NULL')
+            ->select('o.order_id')
+            ->setMaxResults(30)
+            ->getQuery()
+            ->getSingleColumnResult();
+    }
 }

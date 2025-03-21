@@ -47,6 +47,12 @@ class ZohoOrder extends AEntity
      * @ORM\Column(type="boolean")
      */
     protected $synced = true;
+    
+    /**
+     * @var boolean
+     * @ORM\Column(type="boolean")
+     */
+    protected $quote_synced = true;
 
     /**
      * @var boolean
@@ -101,6 +107,17 @@ class ZohoOrder extends AEntity
     public function setTotal($total): self
     {
         $this->total = $total;
+        return $this;
+    }
+
+    public function getQuoteSynced()
+    {
+        return $this->quote_synced;
+    }
+
+    public function setQuoteSynced($quote_synced): self
+    {
+        $this->quote_synced = $quote_synced;
         return $this;
     }
 
