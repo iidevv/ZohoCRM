@@ -117,9 +117,7 @@ class Command implements ICommand
                         $zohoModel->setSkipped(true);
                     }
 
-                    if (($zohoModel instanceof \Iidev\ZohoCRM\Model\ZohoOrder) || ($zohoModel instanceof \Iidev\ZohoCRM\Model\ZohoQuote)) {
-                        $zohoModel->setTotal($model->getTotal());
-                    }
+                    $zohoModel->setTotal($model->getTotal());
 
                     Database::getEM()->persist($zohoModel);
                     $index++;
