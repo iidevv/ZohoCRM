@@ -53,6 +53,8 @@ class PushOrdersCommand extends Command
     {
         $record = new Record();
 
+        $record = $this->getKountInfo($record, $order->getOrderId());
+
         $date = new \DateTime('@' . $order->getDate());
         $record->addFieldValue(new Field('placedOn'), $date);
 
@@ -114,6 +116,25 @@ class PushOrdersCommand extends Command
         $owner->setId(Config::getInstance()->Iidev->ZohoCRM->owner_id);
 
         $record->addFieldValue(Sales_Orders::Owner(), $owner);
+
+        return $record;
+    }
+
+    protected function getKountInfo($record, $orderId)
+    {
+        $inquiry = \XLite\Core\Database::getRepo(\Iidev\Kount\Model\InquiryOrders::class)->findOneBy([
+            'orderid' => $orderId
+        ]);
+
+        if (empty($inquiry))
+            return $record;
+
+        $record->addFieldValue(new Field('kountLink'), "https://awc.kount.net/workflow/detail.html?id={$inquiry->getTransactionId()}");
+        $record->addFieldValue(new Field('kountScore'), (string) $inquiry->getScore());
+        $record->addFieldValue(new Field('kountOmniscore'), (string) $inquiry->getOmniscore());
+        $record->addFieldValue(new Field('kountWarnings'), $inquiry->getWarnings());
+        $record->addFieldValue(new Field('kountIp'), "https://whatismyipaddress.com/ip/{$inquiry->getIpAddress()}");
+        $record->addFieldValue(new Field('kountZipcode'), (string) $inquiry->getZipcode());
 
         return $record;
     }
