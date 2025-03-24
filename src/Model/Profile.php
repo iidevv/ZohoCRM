@@ -6,15 +6,13 @@ use Doctrine\ORM\Mapping as ORM;
 
 use XCart\Extender\Mapping\Extender;
 use Iidev\ZohoCRM\Core\ZohoAwareInterface;
-use XLite\InjectLoggerTrait;
+
 /**
  * @Extender\Mixin
  * @ORM\HasLifecycleCallbacks
  */
 class Profile extends \XLite\Model\Profile implements ZohoAwareInterface
 {
-    use InjectLoggerTrait;
-
     /**
      * @var \Iidev\ZohoCRM\Model\ZohoProfile
      *

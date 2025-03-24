@@ -70,8 +70,10 @@ class PushProfilesCommand extends Command
         $record->addFieldValue(Contacts::Email(), $profile->getLogin());
 
         $membership = $profile->getMembershipId() ? "Professional (Pro)" : "-None-";
-
         $record->addFieldValue(new Field('membership'), new Choice($membership));
+
+        $verfied = $profile->isVerified();
+        $record->addFieldValue(new Field('verified'), $verfied);
 
         if (!empty($profile->getBillingAddress())) {
             $record->addFieldValue(Contacts::FirstName(), $profile->getBillingAddress()->getFirstname());
