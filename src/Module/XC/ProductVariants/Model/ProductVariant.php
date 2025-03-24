@@ -1,6 +1,6 @@
 <?php
 
-namespace Iidev\ZohoCRM\Model;
+namespace Iidev\ZohoCRM\Module\XC\ProductVariants\Model;
 
 use Doctrine\ORM\Mapping as ORM;
 
