@@ -16,7 +16,7 @@ class CreateOrdersCommand extends Command
 
     protected static $defaultName = 'ZohoCRM:CreateOrders';
 
-    protected MessageBusInterface    $bus;
+    protected MessageBusInterface $bus;
     protected CreateOrdersDispatcher $dispatcher;
 
     public function __construct(MessageBusInterface $bus, CreateOrdersDispatcher $dispatcher)
@@ -33,10 +33,12 @@ class CreateOrdersCommand extends Command
             $this->setRunning();
 
             $output->writeln('Started: ' . \XLite\Core\Converter::formatTime());
-
-            $message = $this->dispatcher->getMessage();
-            $this->bus->dispatch($message);
-
+            if ((int) \XLite\Core\Config::getInstance()->Iidev->ZohoCRM->orders_enable_sync === 1) {
+                $message = $this->dispatcher->getMessage();
+                $this->bus->dispatch($message);
+            } else {
+                $output->writeln("Order synchronization disabled");
+            }
             $output->writeln('Done: ' . \XLite\Core\Converter::formatTime());
             $output->writeln('----------------------');
 

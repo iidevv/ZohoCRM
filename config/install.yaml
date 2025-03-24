@@ -36,3 +36,11 @@ XLite\Model\Config:
     translations:
       - code: en
         option_name: "Start sync from order number (0 - no limit)"
+  - name: orders_enable_sync
+    category: Iidev\ZohoCRM
+    type: XLite\View\FormField\Input\Checkbox\OnOffWithoutOffLabel
+    orderBy: 300
+    value: false
+    translations:
+      - code: en
+        option_name: "Enable order synchronization"
