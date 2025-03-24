@@ -6,7 +6,6 @@ use Doctrine\ORM\Mapping as ORM;
 
 use XCart\Extender\Mapping\Extender;
 use Iidev\ZohoCRM\Core\ZohoAwareInterface;
-use function PHPUnit\Framework\returnArgument;
 
 /**
  * @Extender\Mixin

@@ -131,9 +131,6 @@ class Command implements ICommand
     protected function getZohoModel($model, $modelClass)
     {
         switch ($modelClass) {
-            case \Iidev\ZohoCRM\Model\ZohoOrder::class:
-                return $model->getZohoOrder();
-
             case \Iidev\ZohoCRM\Model\ZohoQuote::class:
                 return $model->getZohoQuote();
 

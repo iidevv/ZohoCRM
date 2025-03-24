@@ -5,19 +5,20 @@ namespace Iidev\ZohoCRM\Model;
 use Doctrine\ORM\Mapping as ORM;
 
 use XCart\Extender\Mapping\Extender;
+use Iidev\ZohoCRM\Core\ZohoAwareInterface;
 
 /**
  * @Extender\Mixin
  * @ORM\HasLifecycleCallbacks
  */
-class Order extends \XLite\Model\Order
+class Order extends \XLite\Model\Order implements ZohoAwareInterface
 {
     /**
      * @var \Iidev\ZohoCRM\Model\ZohoOrder
      *
      * @ORM\OneToOne(targetEntity="Iidev\ZohoCRM\Model\ZohoOrder", mappedBy="order_id", cascade={"merge", "detach", "persist"})
      */
-    protected $zohoOrder;
+    protected $zohoModel;
 
     /**
      * @var \Iidev\ZohoCRM\Model\ZohoQuote
@@ -28,18 +29,23 @@ class Order extends \XLite\Model\Order
     /**
      * @return \Iidev\ZohoCRM\Model\ZohoOrder|null
      */
-    public function getZohoOrder()
+    public function getZohoModel()
     {
-        return $this->zohoOrder;
+        return $this->zohoModel;
     }
 
     /**
-     * @param \Iidev\ZohoCRM\Model\ZohoOrder|null $zohoOrder
+     * @param \Iidev\ZohoCRM\Model\ZohoOrder|null $zohoModel
      * @return self
      */
-    public function setZohoOrder($zohoOrder): self
+    public function setZohoModel($zohoModel): self
     {
-        $this->zohoOrder = $zohoOrder;
+        if ($zohoModel instanceof \Iidev\ZohoCRM\Model\ZohoQuote) {
+            $this->zohoQuote = $zohoModel;
+        } else {
+            $this->zohoModel = $zohoModel;
+        }
+
         return $this;
     }
 
@@ -62,27 +68,13 @@ class Order extends \XLite\Model\Order
     }
 
     /**
-     * @param mixed $zohoModel
-     * @return self
-     */
-    public function setZohoModel($zohoModel): self
-    {
-        if ($zohoModel instanceof \Iidev\ZohoCRM\Model\ZohoOrder) {
-            $this->zohoOrder = $zohoModel;
-        } elseif ($zohoModel instanceof \Iidev\ZohoCRM\Model\ZohoQuote) {
-            $this->zohoQuote = $zohoModel;
-        }
-        return $this;
-    }
-
-    /**
      * @return array|null
      */
     public function getDecodedZohoErrors()
     {
         $errors = [];
-        if ($this->zohoOrder && $this->zohoOrder->getErrors()) {
-            $errors['order'] = json_decode($this->zohoOrder->getErrors(), true) ?: [];
+        if ($this->zohoModel && $this->zohoModel->getErrors()) {
+            $errors['order'] = json_decode($this->zohoModel->getErrors(), true) ?: [];
         }
         if ($this->zohoQuote && $this->zohoQuote->getErrors()) {
             $errors['quote'] = json_decode($this->zohoQuote->getErrors(), true) ?: [];
@@ -95,7 +87,7 @@ class Order extends \XLite\Model\Order
      */
     public function isSkipped()
     {
-        return (!$this->zohoOrder || $this->zohoOrder->getSkipped()) && (!$this->zohoQuote || $this->zohoQuote->getSkipped());
+        return (!$this->zohoModel || $this->zohoModel->getSkipped()) && (!$this->zohoQuote || $this->zohoQuote->getSkipped());
     }
 
     /**
@@ -107,8 +99,8 @@ class Order extends \XLite\Model\Order
     {
         parent::processPostUpdate();
 
-        if ($this->zohoOrder) {
-            $this->zohoOrder->setSynced(false);
+        if ($this->zohoModel) {
+            $this->zohoModel->setSynced(false);
         }
         if ($this->zohoQuote) {
             $this->zohoQuote->setSynced(false);

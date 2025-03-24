@@ -55,7 +55,7 @@ class UpdateOrdersCommand extends Command
 
     protected function getOrder(Order $order)
     {
-        $zohoId = $order->getZohoOrder()?->getZohoId();
+        $zohoId = $order->getZohoModel()?->getZohoId();
 
         $record = new Record();
 
@@ -95,7 +95,7 @@ class UpdateOrdersCommand extends Command
             $record->addFieldValue(new Field('contactName'), $profile);
         }
 
-        if ($order->getTotal() !== $order->getZohoOrder()->getTotal()) {
+        if ($order->getTotal() !== $order->getZohoModel()->getTotal()) {
             $this->getExistingLineItems($zohoId);
 
             $orderedProducts = array_merge($this->getOrderItems($order->getItems()), $this->deletedItems);

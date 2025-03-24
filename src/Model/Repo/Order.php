@@ -23,7 +23,7 @@ class Order extends \XLite\Model\Repo\Order
     protected function prepareCndZohoOrders(\Doctrine\ORM\QueryBuilder $queryBuilder, $value)
     {
         $queryBuilder
-            ->leftJoin('o.zohoOrder', 'zo')
+            ->leftJoin('o.zohoModel', 'zo')
             ->andWhere('zo.order_id IS NOT NULL')
             ->andWhere('zo.errors != :emptyString')
             ->setParameter('emptyString', '');
@@ -34,7 +34,7 @@ class Order extends \XLite\Model\Repo\Order
         $createOrdersFrom = (int) Config::getInstance()->Iidev->ZohoCRM->orders_from_number;
 
         $qb = $this->createQueryBuilder('o')
-            ->leftJoin('o.zohoOrder', 'zo')
+            ->leftJoin('o.zohoModel', 'zo')
             ->leftJoin('o.zohoQuote', 'zq')
             ->andWhere('o.payment_method_name != :paymentMethod OR zq.zoho_id IS NOT NULL')
             ->andWhere('zo.zoho_id IS NULL')
@@ -54,7 +54,7 @@ class Order extends \XLite\Model\Repo\Order
     public function findOrderIdsToUpdateInZoho()
     {
         return $this->createQueryBuilder('o')
-            ->leftJoin('o.zohoOrder', 'zo')
+            ->leftJoin('o.zohoModel', 'zo')
             ->andWhere('zo.zoho_id IS NOT NULL')
             ->andWhere('zo.synced = false')
             ->andWhere('zo.skipped = false OR zo.skipped IS NULL')
