@@ -27,6 +27,9 @@ class CreateQuotes extends Periodic
      */
     protected function runStep()
     {
+        if ((int) \XLite\Core\Config::getInstance()->Iidev->ZohoCRM->orders_enable_sync !== 1)
+            return;
+        
         $dispatcher = new CreateQuotesDispatcher();
         $message = $dispatcher->getMessage();
 
