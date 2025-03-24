@@ -6,13 +6,15 @@ use Doctrine\ORM\Mapping as ORM;
 
 use XCart\Extender\Mapping\Extender;
 use Iidev\ZohoCRM\Core\ZohoAwareInterface;
-
+use XLite\InjectLoggerTrait;
 /**
  * @Extender\Mixin
  * @ORM\HasLifecycleCallbacks
  */
 class Profile extends \XLite\Model\Profile implements ZohoAwareInterface
 {
+    use InjectLoggerTrait;
+
     /**
      * @var \Iidev\ZohoCRM\Model\ZohoProfile
      *
@@ -61,6 +63,15 @@ class Profile extends \XLite\Model\Profile implements ZohoAwareInterface
         return true;
     }
 
+    public function setMembership(\XLite\Model\Membership $membership = null)
+    {
+        parent::setMembership($membership);
+
+        if ($this->zohoModel) {
+            $this->zohoModel->setSynced(false);
+        }
+    }
+
     /**
      * @ORM\PostUpdate
      *
@@ -69,8 +80,8 @@ class Profile extends \XLite\Model\Profile implements ZohoAwareInterface
     public function processPostUpdate()
     {
         $changeSet = \XLite\Core\Database::getEM()->getUnitOfWork()->getEntityChangeSet($this);
-        
-        if (!isset($changeSet['login']) && !isset($changeSet['membership'])) {
+
+        if (!isset($changeSet['login'])) {
             return;
         }
 
