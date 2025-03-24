@@ -13,6 +13,8 @@ class ZohoGeneral extends Zoho
         'owner_id',
         'deleted_product_id',
         'debug_enabled',
+        'orders_from_number',
+        'orders_enable_sync'
     ];
 
     protected function doActionInitialize()
