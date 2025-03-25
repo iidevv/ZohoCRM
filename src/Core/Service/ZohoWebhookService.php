@@ -82,7 +82,6 @@ class ZohoWebhookService
             $this->getLogger('ZohoCRM')->error("Invalid or missing 'verified' value in payload", $data);
             return;
         }
-        $this->getLogger('ZohoCRM')->error($data['verified'], [$verified]);
 
         $profile = $zohoModel->getId();
         if ($profile->getVerificationInfo()) {
