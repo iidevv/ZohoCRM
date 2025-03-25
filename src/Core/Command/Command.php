@@ -8,7 +8,7 @@ use com\zoho\crm\api\util\Choice;
 use com\zoho\crm\api\record\ActionWrapper;
 use com\zoho\crm\api\record\SuccessResponse;
 use com\zoho\crm\api\record\APIException;
-use Iidev\ZohoCRM\Core\ZohoAwareInterface;
+use XC\ProductVariants\Model\ProductVariant;
 use XLite\InjectLoggerTrait;
 use com\zoho\crm\api\record\Record;
 use com\zoho\crm\api\record\Field;
@@ -198,5 +198,15 @@ class Command implements ICommand
         }
 
         return static::QUOTE_CLOSED_LOST;
+    }
+
+    protected function getVariantTitle(ProductVariant $model)
+    {
+        $attrsString = array_reduce($model->getValues(), static function ($str, $attr) {
+            $str .= $attr->asString() . ' ';
+            return $str;
+        }, '');
+
+        return $model->getProduct()->getName() . ' ' . trim($attrsString);
     }
 }

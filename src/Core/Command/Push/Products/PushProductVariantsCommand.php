@@ -90,14 +90,4 @@ class PushProductVariantsCommand extends Command
 
         return $record;
     }
-
-    protected function getVariantTitle(ProductVariant $model)
-    {
-        $attrsString = array_reduce($model->getValues(), static function ($str, $attr) {
-            $str .= $attr->asString() . ' ';
-            return $str;
-        }, '');
-
-        return $model->getProduct()->getName() . ' ' . trim($attrsString);
-    }
 }

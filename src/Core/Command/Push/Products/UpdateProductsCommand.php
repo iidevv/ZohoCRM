@@ -64,6 +64,7 @@ class UpdateProductsCommand extends Command
         $record = new Record();
 
         $record->addFieldValue(Products::id(), $product->getZohoModel()->getZohoId());
+        $record->addFieldValue(Products::ProductName(), $product->getName());
         $record->addFieldValue(Products::ProductCode(), $product->getSku());
         $record->addFieldValue(Products::QtyInStock(), (double) $product->getAmount());
         $record->addFieldValue(Products::UnitPrice(), $product->getPrice());

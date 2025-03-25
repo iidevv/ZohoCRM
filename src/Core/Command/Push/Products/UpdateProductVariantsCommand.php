@@ -66,6 +66,7 @@ class UpdateProductVariantsCommand extends Command
         $price = $variant->getDefaultPrice() ? $product->getPrice() : $variant->getPrice();
 
         $record->addFieldValue(Products::id(), $variant->getZohoModel()->getZohoId());
+        $record->addFieldValue(Products::ProductName(), $this->getVariantTitle($variant));
         $record->addFieldValue(Products::ProductCode(), $variant->getSku());
         $record->addFieldValue(Products::QtyInStock(), (double) $variant->getAmount());
         $record->addFieldValue(Products::UnitPrice(), $price);
