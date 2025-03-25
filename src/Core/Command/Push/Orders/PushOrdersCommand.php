@@ -63,6 +63,13 @@ class PushOrdersCommand extends Command
 
         $record->addFieldValue(Sales_Orders::Subject(), "#{$order->getOrderNumber()}");
         $record->addFieldValue(new Field('entityId'), (string) $order->getOrderNumber());
+
+        $paymentCard = $order->getCloverPaymentsCard();
+        
+        if(!empty($paymentCard)) {
+            $record->addFieldValue(new Field('cardNumber'), (string) "{$paymentCard['card_type']} {$paymentCard['card_number']} {$paymentCard['expire']}");
+        }
+        
         $record->addFieldValue(Sales_Orders::OrderedItems(), $this->getOrderItems($order->getItems()));
 
         $shippingAddress = $order->getProfile()->getShippingAddress();
