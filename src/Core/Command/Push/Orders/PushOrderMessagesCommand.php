@@ -71,6 +71,7 @@ class PushOrderMessagesCommand extends Command
         } else {
             $name = "Conversation #{$message->getConversation()->getId()}";
         }
+        $record->addFieldValue(new Field('entityId'), (string) $message->getId());
 
         $record->addFieldValue(new Field('Name'), $name);
 

@@ -62,6 +62,7 @@ class PushOrdersCommand extends Command
         $record->addFieldValue(new Field('paymentStatus'), new Choice($order->getPaymentStatus()->getName()));
 
         $record->addFieldValue(Sales_Orders::Subject(), "#{$order->getOrderNumber()}");
+        $record->addFieldValue(new Field('entityId'), (string) $order->getOrderNumber());
         $record->addFieldValue(Sales_Orders::OrderedItems(), $this->getOrderItems($order->getItems()));
 
         $shippingAddress = $order->getProfile()->getShippingAddress();

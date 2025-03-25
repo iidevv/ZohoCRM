@@ -4,21 +4,17 @@ namespace Iidev\ZohoCRM\Core\Command\Push\Quotes;
 
 use Exception;
 use Iidev\ZohoCRM\Core\Command\Command;
-use XLite\Core\Database;
 use XLite\Model\Order;
 use XLite\Core\Config;
 use com\zoho\crm\api\HeaderMap;
 use com\zoho\crm\api\record\RecordOperations;
 use com\zoho\crm\api\record\BodyWrapper;
 use com\zoho\crm\api\record\Quotes;
-use com\zoho\crm\api\record\LineItemProduct;
-use com\zoho\crm\api\record\Products;
 use com\zoho\crm\api\record\Record;
 use com\zoho\crm\api\users\MinifiedUser;
 use com\zoho\crm\api\record\Field;
 use com\zoho\crm\api\util\Choice;
 use XLite\Model\Base\Surcharge;
-use \XLite\Model\OrderItem;
 
 class PushQuotesCommand extends Command
 {
@@ -64,6 +60,8 @@ class PushQuotesCommand extends Command
         $record->addFieldValue(Quotes::QuoteStage(), new Choice($this->getQuoteStage($order)));
 
         $record->addFieldValue(Quotes::Subject(), "#{$order->getOrderNumber()}");
+        $record->addFieldValue(new Field('entityId'), (string) $order->getOrderNumber());
+
         $record->addFieldValue(Quotes::QuotedItems(), $this->getOrderItems($order->getItems()));
 
         $shippingAddress = $order->getProfile()->getShippingAddress();
