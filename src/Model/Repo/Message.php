@@ -22,7 +22,7 @@ class Message extends \XC\VendorMessages\Model\Repo\Message
             ->andWhere('zm.skipped = false OR zm.skipped IS NULL')
             ->andWhere('zo.zoho_id IS NOT NULL OR o.order_id IS NULL')
             ->select('m.id')
-            ->setMaxResults(30)
+            ->setMaxResults(100)
             ->getQuery()
             ->getSingleColumnResult();
     }

@@ -37,7 +37,7 @@ class Profile extends \XLite\Model\Repo\Profile
             ->andWhere('zm.skipped = false OR zm.skipped IS NULL')
             ->andWhere('a.address_id IS NOT NULL')
             ->select('DISTINCT p.profile_id')
-            ->setMaxResults(30)
+            ->setMaxResults(100)
             ->getQuery()
             ->getSingleColumnResult();
     }
@@ -50,7 +50,7 @@ class Profile extends \XLite\Model\Repo\Profile
             ->andWhere('zm.synced = false')
             ->andWhere('zm.skipped = false OR zm.skipped IS NULL')
             ->select('p.profile_id')
-            ->setMaxResults(30)
+            ->setMaxResults(100)
             ->getQuery()
             ->getSingleColumnResult();
     }

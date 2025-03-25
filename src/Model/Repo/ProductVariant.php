@@ -33,7 +33,7 @@ class ProductVariant extends \XC\ProductVariants\Model\Repo\ProductVariant
             ->leftJoin('v.zohoModel', 'zm')
             ->andWhere('zm.zoho_id IS NULL')
             ->select('v.id')
-            ->setMaxResults(30)
+            ->setMaxResults(100)
             ->getQuery()->getSingleColumnResult();
     }
 
@@ -45,7 +45,7 @@ class ProductVariant extends \XC\ProductVariants\Model\Repo\ProductVariant
             ->andWhere('zm.synced = false')
             ->andWhere('zm.skipped = false OR zm.skipped IS NULL')
             ->select('v.id')
-            ->setMaxResults(30)
+            ->setMaxResults(100)
             ->getQuery()->getSingleColumnResult();
     }
 }

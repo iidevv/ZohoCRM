@@ -36,7 +36,7 @@ class Product extends \XLite\Model\Repo\Product
             ->andWhere('zm.skipped = false OR zm.skipped IS NULL')
             ->setParameter('enabled', 1)
             ->select('p.product_id')
-            ->setMaxResults(30)
+            ->setMaxResults(100)
             ->getQuery()->getSingleColumnResult();
     }
 
@@ -50,7 +50,7 @@ class Product extends \XLite\Model\Repo\Product
             ->andWhere('zm.skipped = false OR zm.skipped IS NULL')
             ->setParameter('enabled', 1)
             ->select('p.product_id')
-            ->setMaxResults(30)
+            ->setMaxResults(100)
             ->getQuery()->getSingleColumnResult();
     }
 }
