@@ -1,37 +1,44 @@
 XLite\Model\Config:
+  - name: webhook_token
+    category: Iidev\ZohoCRM
+    type: XLite\View\FormField\Input\Text
+    orderby: 10
+    translations:
+      - code: en
+        option_name: "Webhook token"
   - name: store_path
     category: Iidev\ZohoCRM
     type: XLite\View\FormField\Input\Text
-    orderby: 0
+    orderby: 20
     translations:
       - code: en
         option_name: "File store path"
   - name: owner_id
     category: Iidev\ZohoCRM
     type: XLite\View\FormField\Input\Text
-    orderby: 100
+    orderby: 30
     translations:
       - code: en
         option_name: "Owner ID"
   - name: deleted_product_id
     category: Iidev\ZohoCRM
     type: XLite\View\FormField\Input\Text
-    orderby: 150
+    orderby: 40
     translations:
       - code: en
         option_name: "Deleted Product Placeholder ID"
-        option_comment: 'This is a placeholder product used when an item in an order has been deleted from the shopping cart. It ensures the order can be processed without missing line items.'
+        option_comment: "This is a placeholder product used when an item in an order has been deleted from the shopping cart. It ensures the order can be processed without missing line items."
   - name: debug_enabled
     category: Iidev\ZohoCRM
     type: XLite\View\FormField\Input\Checkbox\OnOffWithoutOffLabel
-    orderby: 200
+    orderby: 50
     translations:
       - code: en
         option_name: "Enable debugging"
   - name: orders_from_number
     category: Iidev\ZohoCRM
     type: XLite\View\FormField\Input\Text\Integer
-    orderBy: 250
+    orderBy: 60
     value: 0
     translations:
       - code: en
@@ -39,7 +46,7 @@ XLite\Model\Config:
   - name: orders_enable_sync
     category: Iidev\ZohoCRM
     type: XLite\View\FormField\Input\Checkbox\OnOffWithoutOffLabel
-    orderBy: 300
+    orderBy: 70
     value: false
     translations:
       - code: en

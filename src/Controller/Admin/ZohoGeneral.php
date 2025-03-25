@@ -9,6 +9,7 @@ use Iidev\ZohoCRM\Core\SDK\SDK;
 class ZohoGeneral extends Zoho
 {
     const OPTIONS = [
+        'webhook_token',
         'store_path',
         'owner_id',
         'deleted_product_id',
