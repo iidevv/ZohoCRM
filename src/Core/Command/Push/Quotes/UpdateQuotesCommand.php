@@ -108,11 +108,7 @@ class UpdateQuotesCommand extends Command
             $discount = $order->getSurchargeSumByType(Surcharge::TYPE_DISCOUNT);
             $record->addFieldValue(Quotes::Discount(), (double) abs($discount));
 
-            $tax = $order->getSurchargeSumByType(Surcharge::TYPE_TAX);
-            $shipping = $order->getSurchargeSumByType(Surcharge::TYPE_SHIPPING);
-            $adjustment = $shipping + $tax;
-
-            $record->addFieldValue(Quotes::Adjustment(), (double) $adjustment);
+            $record->addFieldValue(Quotes::Adjustment(), (double) $this->getAdjustment($order));
         }
 
         return $record;

@@ -16,6 +16,7 @@ use com\zoho\crm\api\record\LineItemProduct;
 use com\zoho\crm\api\record\Products;
 use \XLite\Model\OrderItem;
 use XLite\Model\Order;
+use XLite\Model\Base\Surcharge;
 
 class Command implements ICommand
 {
@@ -193,10 +194,21 @@ class Command implements ICommand
         $record = new Record();
         $record->addFieldValue(Products::ProductName(), $lineItemProduct);
 
-        $record->addFieldValue(new Field('List_Price'), (double) $orderItem->getTotal() / $orderItem->getAmount());
+        $listPrice = bcdiv((string) $orderItem->getTotal(), (string) $orderItem->getAmount(), 2);
+
+        $record->addFieldValue(new Field('List_Price'), (double) $listPrice);
         $record->addFieldValue(new Field('Quantity'), (double) $orderItem->getAmount());
 
         return $record;
+    }
+
+    protected function getAdjustment(Order $order)
+    {
+        $tax = $order->getSurchargeSumByType(Surcharge::TYPE_TAX);
+        $shipping = $order->getSurchargeSumByType(Surcharge::TYPE_SHIPPING);
+        $adjustment = bcadd((string) $tax, (string) $shipping, 2);
+
+        return (double) $adjustment;
     }
 
     protected function getQuoteStage(Order $order)

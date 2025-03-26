@@ -98,11 +98,7 @@ class PushOrdersCommand extends Command
         $discount = $order->getSurchargeSumByType(Surcharge::TYPE_DISCOUNT);
         $record->addFieldValue(Sales_Orders::Discount(), (double) abs($discount));
 
-        $tax = $order->getSurchargeSumByType(Surcharge::TYPE_TAX);
-        $shipping = $order->getSurchargeSumByType(Surcharge::TYPE_SHIPPING);
-        $adjustment = $shipping + $tax;
-
-        $record->addFieldValue(Sales_Orders::Adjustment(), (double) $adjustment);
+        $record->addFieldValue(Sales_Orders::Adjustment(), $this->getAdjustment($order));
 
         $record->addFieldValue(new Field('customerNotes'), $order->getNotes());
 
