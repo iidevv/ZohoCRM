@@ -54,13 +54,21 @@ services:
 
   # Task
 
-  # Iidev\ZohoCRM\Core\Task\Products\CreateProducts:
-  #   tags:
-  #     - {
-  #         name: kernel.event_listener,
-  #         event: zoho.cronjob,
-  #         method: handleTask,
-  #       }
+  Iidev\ZohoCRM\Core\Task\Products\CreateProducts:
+    tags:
+      - {
+          name: kernel.event_listener,
+          event: zoho.cronjob,
+          method: handleTask,
+        }
+  
+  Iidev\ZohoCRM\Core\Task\Products\CreateProductVariants:
+    tags:
+      - {
+          name: kernel.event_listener,
+          event: zoho.cronjob,
+          method: handleTask,
+        }
 
   Iidev\ZohoCRM\Core\Task\Products\UpdateProducts:
     tags:
@@ -70,61 +78,69 @@ services:
           method: handleTask,
         }
 
-  # Iidev\ZohoCRM\Core\Task\Profiles\CreateProfiles:
-  #   tags:
-  #     - {
-  #         name: kernel.event_listener,
-  #         event: zoho.cronjob,
-  #         method: handleTask,
-  #       }
+  Iidev\ZohoCRM\Core\Task\Products\UpdateProductVariants:
+    tags:
+      - {
+          name: kernel.event_listener,
+          event: zoho.cronjob,
+          method: handleTask,
+        }
+
+  Iidev\ZohoCRM\Core\Task\Profiles\CreateProfiles:
+    tags:
+      - {
+          name: kernel.event_listener,
+          event: zoho.cronjob,
+          method: handleTask,
+        }
   
-  # Iidev\ZohoCRM\Core\Task\Profiles\UpdateProfiles:
-  #   tags:
-  #     - {
-  #         name: kernel.event_listener,
-  #         event: zoho.cronjob,
-  #         method: handleTask,
-  #       }
+  Iidev\ZohoCRM\Core\Task\Profiles\UpdateProfiles:
+    tags:
+      - {
+          name: kernel.event_listener,
+          event: zoho.cronjob,
+          method: handleTask,
+        }
 
-  # Iidev\ZohoCRM\Core\Task\Orders\CreateOrders:
-  #   tags:
-  #     - {
-  #         name: kernel.event_listener,
-  #         event: zoho.cronjob,
-  #         method: handleTask,
-  #       }
+  Iidev\ZohoCRM\Core\Task\Orders\CreateOrders:
+    tags:
+      - {
+          name: kernel.event_listener,
+          event: zoho.cronjob,
+          method: handleTask,
+        }
 
-  # Iidev\ZohoCRM\Core\Task\Orders\UpdateOrders:
-  #   tags:
-  #     - {
-  #         name: kernel.event_listener,
-  #         event: zoho.cronjob,
-  #         method: handleTask,
-  #       }
+  Iidev\ZohoCRM\Core\Task\Orders\UpdateOrders:
+    tags:
+      - {
+          name: kernel.event_listener,
+          event: zoho.cronjob,
+          method: handleTask,
+        }
 
-  # Iidev\ZohoCRM\Core\Task\Orders\CreateOrderMessages:
-  #   tags:
-  #     - {
-  #         name: kernel.event_listener,
-  #         event: zoho.cronjob,
-  #         method: handleTask,
-  #       }
+  Iidev\ZohoCRM\Core\Task\Orders\CreateOrderMessages:
+    tags:
+      - {
+          name: kernel.event_listener,
+          event: zoho.cronjob,
+          method: handleTask,
+        }
 
-  # Iidev\ZohoCRM\Core\Task\Quotes\CreateQuotes:
-  #   tags:
-  #     - {
-  #         name: kernel.event_listener,
-  #         event: zoho.cronjob,
-  #         method: handleTask,
-  #       }
+  Iidev\ZohoCRM\Core\Task\Quotes\CreateQuotes:
+    tags:
+      - {
+          name: kernel.event_listener,
+          event: zoho.cronjob,
+          method: handleTask,
+        }
 
-  # Iidev\ZohoCRM\Core\Task\Quotes\UpdateQuotes:
-  #   tags:
-  #     - {
-  #         name: kernel.event_listener,
-  #         event: zoho.cronjob,
-  #         method: handleTask,
-  #       }
+  Iidev\ZohoCRM\Core\Task\Quotes\UpdateQuotes:
+    tags:
+      - {
+          name: kernel.event_listener,
+          event: zoho.cronjob,
+          method: handleTask,
+        }
 
   # Command
 
