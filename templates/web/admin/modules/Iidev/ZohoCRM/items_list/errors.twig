@@ -1,8 +1,6 @@
 {% if this.entity.decodedZohoErrors %}
     {% set errors = this.entity.decodedZohoErrors %}
-    {% if errors.message %}
-        {{ errors|json_encode|e('html_attr') }}
-    {% endif %}
+    {{ errors|json_encode|e('html_attr') }}
 {% else %}
     -
 {% endif %}

@@ -87,6 +87,12 @@ class Command implements ICommand
                 }
 
                 Database::getEM()->flush();
+            } else {
+                $this->getLogger('ZohoCRM')->error('processCreateResult. API response may have failed', [
+                    'response' => json_encode($response),
+                    'modelClass' => $modelClass,
+                    'actionHandler' => $actionHandler
+                ]);
             }
         }
     }
@@ -124,6 +130,12 @@ class Command implements ICommand
                 }
 
                 Database::getEM()->flush();
+            } else {
+                $this->getLogger('ZohoCRM')->error('processUpdateResult. API response may have failed', [
+                    'response' => json_encode($response),
+                    'modelClass' => $modelClass,
+                    'actionHandler' => $actionHandler
+                ]);
             }
         }
     }
