@@ -134,7 +134,7 @@ class PushOrdersCommand extends Command
             'orderid' => $orderId
         ]);
 
-        if (empty($inquiry))
+        if (!$inquiry)
             return $record;
 
         $record->addFieldValue(new Field('kountLink'), "https://awc.kount.net/workflow/detail.html?id={$inquiry->getTransactionId()}");
