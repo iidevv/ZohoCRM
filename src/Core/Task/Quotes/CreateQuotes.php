@@ -42,6 +42,6 @@ class CreateQuotes extends Periodic
      */
     protected function getPeriod()
     {
-        return static::INT_5_MIN;
+        return static::INT_4_MIN;
     }
 }
