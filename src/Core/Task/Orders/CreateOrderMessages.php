@@ -5,7 +5,7 @@ namespace Iidev\ZohoCRM\Core\Task\Orders;
 use Iidev\ZohoCRM\Core\Dispatcher\Orders\CreateOrderMessagesDispatcher;
 use Symfony\Component\Messenger\MessageBusInterface;
 use XCart\Container;
-use XLite\Core\Task\Base\Periodic;
+use Iidev\ZohoCRM\Core\Task\Base\Periodic;
 
 class CreateOrderMessages extends Periodic
 {
@@ -40,15 +40,5 @@ class CreateOrderMessages extends Periodic
     protected function getPeriod()
     {
         return static::INT_5_MIN;
-    }
-
-    public function isReady()
-    {
-        return false;
-    }
-
-    protected function isValid()
-    {
-        return false;
     }
 }

@@ -5,7 +5,7 @@ namespace Iidev\ZohoCRM\Core\Task\Profiles;
 use Iidev\ZohoCRM\Core\Dispatcher\Profiles\CreateProfilesDispatcher;
 use Symfony\Component\Messenger\MessageBusInterface;
 use XCart\Container;
-use XLite\Core\Task\Base\Periodic;
+use Iidev\ZohoCRM\Core\Task\Base\Periodic;
 
 class CreateProfiles extends Periodic
 {
@@ -40,15 +40,5 @@ class CreateProfiles extends Periodic
     protected function getPeriod()
     {
         return static::INT_15_MIN;
-    }
-
-    public function isReady()
-    {
-        return false;
-    }
-
-    protected function isValid()
-    {
-        return false;
     }
 }

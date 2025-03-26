@@ -52,8 +52,86 @@ services:
   Iidev\ZohoCRM\Core\Factory\Commands\Quotes\PushQuotesCommandFactory:
   Iidev\ZohoCRM\Core\Factory\Commands\Quotes\UpdateQuotesCommandFactory:
 
+  # Task
+
+  # Iidev\ZohoCRM\Core\Task\Products\CreateProducts:
+  #   tags:
+  #     - {
+  #         name: kernel.event_listener,
+  #         event: zoho.cronjob,
+  #         method: handleTask,
+  #       }
+
+  Iidev\ZohoCRM\Core\Task\Products\UpdateProducts:
+    tags:
+      - {
+          name: kernel.event_listener,
+          event: zoho.cronjob,
+          method: handleTask,
+        }
+
+  # Iidev\ZohoCRM\Core\Task\Profiles\CreateProfiles:
+  #   tags:
+  #     - {
+  #         name: kernel.event_listener,
+  #         event: zoho.cronjob,
+  #         method: handleTask,
+  #       }
+  
+  # Iidev\ZohoCRM\Core\Task\Profiles\UpdateProfiles:
+  #   tags:
+  #     - {
+  #         name: kernel.event_listener,
+  #         event: zoho.cronjob,
+  #         method: handleTask,
+  #       }
+
+  # Iidev\ZohoCRM\Core\Task\Orders\CreateOrders:
+  #   tags:
+  #     - {
+  #         name: kernel.event_listener,
+  #         event: zoho.cronjob,
+  #         method: handleTask,
+  #       }
+
+  # Iidev\ZohoCRM\Core\Task\Orders\UpdateOrders:
+  #   tags:
+  #     - {
+  #         name: kernel.event_listener,
+  #         event: zoho.cronjob,
+  #         method: handleTask,
+  #       }
+
+  # Iidev\ZohoCRM\Core\Task\Orders\CreateOrderMessages:
+  #   tags:
+  #     - {
+  #         name: kernel.event_listener,
+  #         event: zoho.cronjob,
+  #         method: handleTask,
+  #       }
+
+  # Iidev\ZohoCRM\Core\Task\Quotes\CreateQuotes:
+  #   tags:
+  #     - {
+  #         name: kernel.event_listener,
+  #         event: zoho.cronjob,
+  #         method: handleTask,
+  #       }
+
+  # Iidev\ZohoCRM\Core\Task\Quotes\UpdateQuotes:
+  #   tags:
+  #     - {
+  #         name: kernel.event_listener,
+  #         event: zoho.cronjob,
+  #         method: handleTask,
+  #       }
+
   # Command
 
+  Iidev\ZohoCRM\Command\CronCommand:
+    tags:
+      - { name: "console.command", command: "ZohoCRM:Cron" }
+  
   Iidev\ZohoCRM\Command\Products\CreateProductsCommand:
     tags:
       - { name: "console.command", command: "ZohoCRM:CreateProducts" }
