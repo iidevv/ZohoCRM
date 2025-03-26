@@ -35,7 +35,9 @@ class Command implements ICommand
             throw new \Exception("Zoho SDK is not initialized. Token store is missing or invalid.");
         }
 
-        (new SDK())->initialize([]);
+        if (!empty($this->entityIds)) {
+            (new SDK())->initialize([]);
+        }
     }
 
     public function execute(): void

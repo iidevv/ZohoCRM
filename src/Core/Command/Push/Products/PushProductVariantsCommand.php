@@ -21,12 +21,16 @@ class PushProductVariantsCommand extends Command
     public function __construct(
         array $entityIds
     ) {
-        parent::__construct();
         $this->entityIds = $entityIds;
+        parent::__construct();
     }
 
     public function execute(): void
     {
+        if (empty($this->entityIds)) {
+            return;
+        }
+
         try {
             $recordOperations = new RecordOperations('Products');
             $bodyWrapper = new BodyWrapper();

@@ -21,12 +21,16 @@ class PushOrdersCommand extends Command
     public function __construct(
         array $entityIds
     ) {
-        parent::__construct();
         $this->entityIds = $entityIds;
+        parent::__construct();
     }
 
     public function execute(): void
     {
+        if (empty($this->entityIds)) {
+            return;
+        }
+
         try {
             $recordOperations = new RecordOperations('Sales_Orders');
             $bodyWrapper = new BodyWrapper();
@@ -66,10 +70,10 @@ class PushOrdersCommand extends Command
 
         $paymentCard = $order->getCloverPaymentsCard();
 
-        if(!empty($paymentCard)) {
+        if (!empty($paymentCard)) {
             $record->addFieldValue(new Field('cardNumber'), "{$paymentCard['card_type']} {$paymentCard['card_number']} {$paymentCard['expire']}");
         }
-        
+
         $record->addFieldValue(Sales_Orders::OrderedItems(), $this->getOrderItems($order->getItems()));
 
         $shippingAddress = $order->getProfile()->getShippingAddress();
