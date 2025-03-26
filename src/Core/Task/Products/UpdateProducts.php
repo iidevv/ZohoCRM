@@ -20,7 +20,7 @@ class UpdateProducts extends Periodic
      */
     public function getTitle()
     {
-        return static::t('Update products [ZohoCRM]');
+        return "ZohoCRM:UpdateProducts";
     }
 
     /**

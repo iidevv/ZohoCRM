@@ -4,6 +4,7 @@ namespace Iidev\ZohoCRM\Core\Task;
 
 use Symfony\Component\Console\Output\OutputInterface;
 use Iidev\ZohoCRM\Event\Task\CronEvent;
+use \XLite\Core\Lock\FileLock;
 
 /**
  * Abstract task
@@ -115,23 +116,13 @@ abstract class ATask extends \XLite\Base
     }
 
     /**
-     * Should task started if previous attempt has failed
-     *
-     * @return boolean
-     */
-    public function shouldRunIfCrashed()
-    {
-        return true;
-    }
-
-    /**
      * Lock key
      *
      * @return string
      */
-    public function getLockKey()
+    public function getKey()
     {
-        return static::class . $this->model->getId();
+        return str_replace(':', '.', $this->getTitle());
     }
 
     /**
@@ -141,10 +132,7 @@ abstract class ATask extends \XLite\Base
      */
     public function isRunning()
     {
-        return \XLite\Core\Lock\FileLock::getInstance()->isRunning(
-            $this->getLockKey(),
-            !$this->shouldRunIfCrashed()
-        );
+        return FileLock::getInstance()->isRunning($this->getKey());
     }
 
     /**
@@ -154,9 +142,7 @@ abstract class ATask extends \XLite\Base
      */
     protected function markAsRunning()
     {
-        \XLite\Core\Lock\FileLock::getInstance()->setRunning(
-            $this->getLockKey()
-        );
+        FileLock::getInstance()->setRunning($this->getKey());
     }
 
     /**
@@ -166,9 +152,7 @@ abstract class ATask extends \XLite\Base
      */
     protected function release()
     {
-        \XLite\Core\Lock\FileLock::getInstance()->release(
-            $this->getLockKey()
-        );
+        FileLock::getInstance()->release($this->getKey());
     }
 
     /**
@@ -188,10 +172,7 @@ abstract class ATask extends \XLite\Base
                 $this->printContent($this->getMessage() ?: 'done');
             }
         } elseif ($this->isRunning()) {
-            $msg = !$this->shouldRunIfCrashed()
-                ? '| Task will not be restarted because previous attempt has failed. Remove lock files manually to start the task'
-                : '';
-            $this->printContent($this->getTitle() . ' ... Already running ' . $msg);
+            $this->printContent($this->getTitle() . ' ... Already running ');
         }
 
         if (!$silence) {

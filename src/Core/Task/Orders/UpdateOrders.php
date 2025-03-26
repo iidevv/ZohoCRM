@@ -19,7 +19,7 @@ class UpdateOrders extends Periodic
      */
     public function getTitle()
     {
-        return static::t('Update orders [ZohoCRM]');
+        return "ZohoCRM:UpdateOrders";
     }
 
     /**

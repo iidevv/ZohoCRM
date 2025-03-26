@@ -19,7 +19,7 @@ class UpdateProfiles extends Periodic
      */
     public function getTitle()
     {
-        return static::t('Create profiles [ZohoCRM]');
+        return "ZohoCRM:UpdateProfiles";
     }
 
     /**

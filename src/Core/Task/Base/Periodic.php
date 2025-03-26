@@ -20,19 +20,6 @@ abstract class Periodic extends \Iidev\ZohoCRM\Core\Task\ATask
     abstract protected function getPeriod();
 
     /**
-     * Mark task as running
-     *
-     * @return void
-     */
-    protected function markAsRunning()
-    {
-        \XLite\Core\Lock\FileLock::getInstance()->setRunning(
-            $this->getLockKey(),
-            $this->getPeriod() / 4
-        );
-    }
-
-    /**
      * Finalize step
      *
      * @return void

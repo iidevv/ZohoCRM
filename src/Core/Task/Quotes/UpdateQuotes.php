@@ -19,7 +19,7 @@ class UpdateQuotes extends Periodic
      */
     public function getTitle()
     {
-        return static::t('Update quotes [ZohoCRM]');
+        return "ZohoCRM:UpdateQuotes";
     }
 
     /**

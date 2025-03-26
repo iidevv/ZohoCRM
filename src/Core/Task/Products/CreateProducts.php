@@ -20,7 +20,7 @@ class CreateProducts extends Periodic
      */
     public function getTitle()
     {
-        return static::t('Create products [ZohoCRM]');
+        return "ZohoCRM:CreateProducts";
     }
 
     /**

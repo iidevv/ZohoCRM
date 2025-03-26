@@ -19,7 +19,7 @@ class CreateQuotes extends Periodic
      */
     public function getTitle()
     {
-        return static::t('Create quotes [ZohoCRM]');
+        return "ZohoCRM:CreateQuotes";
     }
 
     /**

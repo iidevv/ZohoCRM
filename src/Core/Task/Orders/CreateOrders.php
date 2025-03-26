@@ -19,7 +19,7 @@ class CreateOrders extends Periodic
      */
     public function getTitle()
     {
-        return static::t('Create orders [ZohoCRM]');
+        return "ZohoCRM:CreateOrders";
     }
 
     /**
