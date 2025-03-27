@@ -22,7 +22,8 @@ class Main extends \XLite\Module\AModule
 
     public function isInitialized()
     {
-        $storePath =Config::getInstance()->Iidev->ZohoCRM->store_path;
+        $storePath = Config::getInstance()->Iidev->ZohoCRM->store_path ?? '';
+
         $tokenstore = new FileStore("{$storePath}/zoho_sdk_token.txt");
 
         try {

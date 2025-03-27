@@ -23,7 +23,7 @@ class SDK
 
     protected function resetTokenStore()
     {
-        $storePath =Config::getInstance()->Iidev->ZohoCRM->store_path;
+        $storePath =Config::getInstance()->Iidev->ZohoCRM->store_path ?? '';
         $tokenFilePath = "{$storePath}/zoho_sdk_token.txt";
 
         if (file_exists($tokenFilePath)) {
@@ -43,7 +43,7 @@ class SDK
                 ->build();
         } else {
             
-            $storePath =Config::getInstance()->Iidev->ZohoCRM->store_path;
+            $storePath =Config::getInstance()->Iidev->ZohoCRM->store_path ?? '';
             $tokenstore = new FileStore("{$storePath}/zoho_sdk_token.txt");
             $token = $tokenstore->findTokenById(1);
         }
@@ -59,7 +59,7 @@ class SDK
     {
         $environment = USDataCenter::PRODUCTION();
         $token = $this->getToken($data);
-        $storePath =Config::getInstance()->Iidev->ZohoCRM->store_path;
+        $storePath =Config::getInstance()->Iidev->ZohoCRM->store_path ?? '';
         $tokenstore = new FileStore("{$storePath}/zoho_sdk_token.txt");
 
         $level = Config::getInstance()->Iidev->ZohoCRM->debug_enabled ? Levels::DEBUG : Levels::ERROR;
