@@ -39,6 +39,6 @@ class CreateProfiles extends Periodic
      */
     protected function getPeriod()
     {
-        return static::INT_15_MIN;
+        return static::INT_4_MIN;
     }
 }
