@@ -76,15 +76,18 @@ class ZohoWebhookService
             return;
         }
 
-        $verified = $data['verified'] && $data['verified'] === 'true' ? VerificationInfo::STATUS_VERIFIED : VerificationInfo::STATUS_NOT_VERIFIED;
-
-        if ($verified === null) {
+        if (!$data['verified']) {
             $this->getLogger('ZohoCRM')->error("Invalid or missing 'verified' value in payload", $data);
             return;
         }
 
+        $verified = $data['verified'] === 'true' ? VerificationInfo::STATUS_VERIFIED : VerificationInfo::STATUS_NOT_VERIFIED;
+
         $profile = $zohoModel->getId();
-        if ($profile->getVerificationInfo()) {
+
+        if ($verified === VerificationInfo::STATUS_VERIFIED) {
+            $profile->makeVerified();
+        } elseif ($verified === VerificationInfo::STATUS_NOT_VERIFIED && $profile->getVerificationInfo()) {
             $profile->getVerificationInfo()
                 ->setStatus($verified);
         }

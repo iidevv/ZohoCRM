@@ -13,7 +13,7 @@ class VerificationInfo extends \Qualiteam\SkinActVerifiedCustomer\Model\Verifica
     {
         parent::setStatus($status);
 
-        $zohoModel = $this->getProfile()->getZohoModel();
+        $zohoModel = $this->getProfile()?->getZohoModel();
 
         if ($zohoModel) {
             $zohoModel->setSynced(false);
