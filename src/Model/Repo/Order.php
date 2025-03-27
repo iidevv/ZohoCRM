@@ -41,6 +41,7 @@ class Order extends \XLite\Model\Repo\Order
             ->andWhere('zo.skipped = false OR zo.skipped IS NULL')
             ->setParameter('paymentMethod', 'Quote')
             ->select('o.order_id')
+            ->orderBy('o.orderNumber', 'DESC')
             ->setMaxResults(50);
 
         if ($createOrdersFrom > 0) {
@@ -59,6 +60,7 @@ class Order extends \XLite\Model\Repo\Order
             ->andWhere('zo.synced = false')
             ->andWhere('zo.skipped = false OR zo.skipped IS NULL')
             ->select('o.order_id')
+            ->orderBy('o.orderNumber', 'DESC')
             ->setMaxResults(50)
             ->getQuery()
             ->getSingleColumnResult();
@@ -75,6 +77,7 @@ class Order extends \XLite\Model\Repo\Order
             ->andWhere('zq.skipped = false OR zq.skipped IS NULL')
             ->setParameter('paymentMethod', 'Quote')
             ->select('o.order_id')
+            ->orderBy('o.orderNumber', 'DESC')
             ->setMaxResults(50);
 
         if ($createOrdersFrom > 0) {
@@ -93,6 +96,7 @@ class Order extends \XLite\Model\Repo\Order
             ->andWhere('zq.synced = false')
             ->andWhere('zq.skipped = false OR zq.skipped IS NULL')
             ->select('o.order_id')
+            ->orderBy('o.orderNumber', 'DESC')
             ->setMaxResults(50)
             ->getQuery()
             ->getSingleColumnResult();
