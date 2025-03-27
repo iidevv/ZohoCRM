@@ -54,6 +54,11 @@ class ZohoWebhookService
         }
 
         $order = $zohoModel->getId();
+
+        if ($order->getPaymentStatus()?->getId() === $paymentStatus?->getId() && $order->getShippingStatus()?->getId() === $shippingStatus?->getId()) {
+            return;
+        }
+
         $order->setPaymentStatus($paymentStatus);
         $order->setShippingStatus($shippingStatus);
 
@@ -84,6 +89,10 @@ class ZohoWebhookService
         $verified = $data['verified'] === 'true' ? VerificationInfo::STATUS_VERIFIED : VerificationInfo::STATUS_NOT_VERIFIED;
 
         $profile = $zohoModel->getId();
+
+        if ($profile->getVerificationInfo()?->getStatus() === $verified) {
+            return;
+        }
 
         if ($verified === VerificationInfo::STATUS_VERIFIED) {
             $profile->makeVerified();
