@@ -41,8 +41,8 @@ class CronCommand extends Command
         $duration = microtime(true) - $actionTime;
         $micro = $duration - floor($duration);
 
-        $output->writeln(
-            PHP_EOL . 'Execution time: '
+        $output->writeln(PHP_EOL . 'Done: ' . \XLite\Core\Converter::formatTime());
+        $output->writeln('Execution time: '
             . gmdate('H:i:s', floor($duration))
             . '.' . sprintf('%04d', $micro * 10000) . ' sec.'
         );
