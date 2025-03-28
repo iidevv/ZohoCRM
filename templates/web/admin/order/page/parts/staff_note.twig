@@ -1,0 +1,14 @@
+{##
+ # Order: Staff note
+ #
+ # @ListChild (list="order.operations", weight="50")
+ #}
+
+{% apply spaceless %}
+    <div class="order-note staff-note">
+      <div class="order-note-box">
+        <h4>{{ t('Staff note history (Use Zoho CRM Notes)') }}</h4>
+        {{ this.get('orderForm').displayComplexField('staffNote') }}
+      </div>
+    </div>
+{% endapply %}
