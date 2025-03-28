@@ -63,8 +63,8 @@ class PushOrdersCommand extends Command
         $date = new \DateTime('@' . $order->getDate());
         $record->addFieldValue(new Field('placedOn'), $date);
 
-        $record->addFieldValue(Sales_Orders::Status(), new Choice($order->getShippingStatus()->getName()));
-        $record->addFieldValue(new Field('paymentStatus'), new Choice($order->getPaymentStatus()->getName()));
+        $record->addFieldValue(Sales_Orders::Status(), new Choice($order->getShippingStatus()?->getName()));
+        $record->addFieldValue(new Field('paymentStatus'), new Choice($order->getPaymentStatus()?->getName()));
 
         $record->addFieldValue(Sales_Orders::Subject(), "#{$order->getOrderNumber()}");
         $record->addFieldValue(new Field('entityId'), (string) $order->getOrderNumber());
