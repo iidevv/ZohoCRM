@@ -96,7 +96,7 @@ class UpdateOrdersCommand extends Command
         if ($profileId) {
             $profile = new Record();
             $profile->setId($profileId);
-            $record->addFieldValue(new Field('contactName'), $profile);
+            $record->addFieldValue(Sales_Orders::ContactName(), $profile);
         }
 
         if ($order->getTotal() !== $order->getZohoModel()->getTotal()) {

@@ -15,6 +15,7 @@ use com\zoho\crm\api\users\MinifiedUser;
 use com\zoho\crm\api\record\Field;
 use com\zoho\crm\api\util\Choice;
 use XLite\Model\Base\Surcharge;
+use XLite\Core\Converter;
 
 class PushOrdersCommand extends Command
 {
@@ -74,6 +75,9 @@ class PushOrdersCommand extends Command
             $record->addFieldValue(new Field('cardNumber'), "{$paymentCard['card_type']} {$paymentCard['card_number']} {$paymentCard['expire']}");
         }
 
+        $record->addFieldValue(new Field('paymentMethod'), (string) $order->getPaymentMethodName());
+        $record->addFieldValue(new Field('orderUrl'), (string) $this->getOrderUrl($order->getOrderNumber()));
+
         $record->addFieldValue(Sales_Orders::OrderedItems(), $this->getOrderItems($order->getItems()));
 
         $shippingAddress = $order->getProfile()->getShippingAddress();
@@ -109,7 +113,7 @@ class PushOrdersCommand extends Command
         if ($profileId) {
             $profile = new Record();
             $profile->setId($profileId);
-            $record->addFieldValue(new Field('contactName'), $profile);
+            $record->addFieldValue(Sales_Orders::ContactName(), $profile);
         }
 
         $quoteId = $order->getZohoQuote()?->getZohoId();
@@ -137,7 +141,7 @@ class PushOrdersCommand extends Command
         if (!$inquiry)
             return $record;
 
-        $record->addFieldValue(new Field('kountLink'), "https://awc.kount.net/workflow/detail.html?id={$inquiry->getTransactionId()}");
+        $record->addFieldValue(new Field('kountUrl'), "https://awc.kount.net/workflow/detail.html?id={$inquiry->getTransactionId()}");
         $record->addFieldValue(new Field('kountScore'), (string) $inquiry->getScore());
         $record->addFieldValue(new Field('kountOmniscore'), (string) $inquiry->getOmniscore());
         $record->addFieldValue(new Field('kountWarnings'), $inquiry->getWarnings());
@@ -145,5 +149,15 @@ class PushOrdersCommand extends Command
         $record->addFieldValue(new Field('kountZipcode'), (string) $inquiry->getZipcode());
 
         return $record;
+    }
+
+    protected function getOrderUrl($orderNumber)
+    {
+        return Converter::buildFullURL(
+            'order',
+            '',
+            ['order_number' => $orderNumber],
+            \XLite::getAdminScript()
+        );
     }
 }
