@@ -96,7 +96,7 @@ class PushQuotesCommand extends Command
 
         $record->addFieldValue(new Field('staffNotes'), $order->getAdminNotes());
 
-        $profileId = $order->getOrigProfile()->getZohoModel()?->getZohoId();
+        $profileId = $order->getOrigProfile()?->getZohoModel()?->getZohoId();
 
         if ($profileId) {
             $profile = new Record();
