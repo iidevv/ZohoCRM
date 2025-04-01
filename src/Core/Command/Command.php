@@ -211,6 +211,38 @@ class Command implements ICommand
         return (double) $adjustment;
     }
 
+    protected function getShippingAddress($record, $recordClass, $shippingAddress)
+    {
+        if (empty($shippingAddress))
+            return $record;
+
+        $shippingStreet = implode(' ', [$shippingAddress->getStreet(), $shippingAddress->getStreet2()]);
+        $record->addFieldValue($recordClass::ShippingStreet(), $shippingStreet);
+        $record->addFieldValue($recordClass::ShippingCity(), $shippingAddress->getCity());
+        $record->addFieldValue($recordClass::ShippingCountry(), $shippingAddress->getCountryName());
+        $record->addFieldValue($recordClass::ShippingState(), $shippingAddress->getStateName());
+        $record->addFieldValue($recordClass::ShippingCode(), $shippingAddress->getZipcode());
+        $record->addFieldValue(new Field('shippingPhone'), $shippingAddress->getPhone());
+
+        return $record;
+    }
+
+    protected function getBillingAddress($record, $recordClass, $billingAddress)
+    {
+        if (empty($billingAddress))
+            return $record;
+
+        $billingStreet = implode(' ', [$billingAddress->getStreet(), $billingAddress->getStreet2()]);
+        $record->addFieldValue($recordClass::BillingStreet(), $billingStreet);
+        $record->addFieldValue($recordClass::BillingCity(), $billingAddress->getCity());
+        $record->addFieldValue($recordClass::BillingCountry(), $billingAddress->getCountryName());
+        $record->addFieldValue($recordClass::BillingState(), $billingAddress->getStateName());
+        $record->addFieldValue($recordClass::BillingCode(), $billingAddress->getZipcode());
+        $record->addFieldValue(new Field('billingPhone'), $billingAddress->getPhone());
+
+        return $record;
+    }
+
     protected function getQuoteStage(Order $order)
     {
         $paymentStatus = $order->getPaymentStatus()?->getCode();

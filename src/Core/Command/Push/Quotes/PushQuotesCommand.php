@@ -68,24 +68,11 @@ class PushQuotesCommand extends Command
 
         $record->addFieldValue(Quotes::QuotedItems(), $this->getOrderItems($order->getItems()));
 
-        $shippingAddress = $order->getProfile()->getShippingAddress();
-        $billingAddress = $order->getProfile()->getBillingAddress();
+        $shippingAddress = $order->getProfile()?->getShippingAddress();
+        $billingAddress = $order->getProfile()?->getBillingAddress();
 
-        $shippingStreet = implode(' ', [$shippingAddress->getStreet(), $shippingAddress->getStreet2()]);
-        $record->addFieldValue(Quotes::ShippingStreet(), $shippingStreet);
-        $record->addFieldValue(Quotes::ShippingCity(), $shippingAddress->getCity());
-        $record->addFieldValue(Quotes::ShippingCountry(), $shippingAddress->getCountryName());
-        $record->addFieldValue(Quotes::ShippingState(), $shippingAddress->getStateName());
-        $record->addFieldValue(Quotes::ShippingCode(), $shippingAddress->getZipcode());
-        $record->addFieldValue(new Field('shippingPhone'), $shippingAddress->getPhone());
-
-        $billingStreet = implode(' ', [$billingAddress->getStreet(), $billingAddress->getStreet2()]);
-        $record->addFieldValue(Quotes::BillingStreet(), $billingStreet);
-        $record->addFieldValue(Quotes::BillingCity(), $billingAddress->getCity());
-        $record->addFieldValue(Quotes::BillingCountry(), $billingAddress->getCountryName());
-        $record->addFieldValue(Quotes::BillingState(), $billingAddress->getStateName());
-        $record->addFieldValue(Quotes::BillingCode(), $billingAddress->getZipcode());
-        $record->addFieldValue(new Field('billingPhone'), $billingAddress->getPhone());
+        $record = $this->getShippingAddress($record, Quotes::class, $shippingAddress);
+        $record = $this->getBillingAddress($record, Quotes::class, $billingAddress);
 
         $discount = $order->getSurchargeSumByType(Surcharge::TYPE_DISCOUNT);
         $record->addFieldValue(Quotes::Discount(), (double) abs($discount));

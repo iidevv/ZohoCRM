@@ -80,24 +80,11 @@ class PushOrdersCommand extends Command
 
         $record->addFieldValue(Sales_Orders::OrderedItems(), $this->getOrderItems($order->getItems()));
 
-        $shippingAddress = $order->getProfile()->getShippingAddress();
-        $billingAddress = $order->getProfile()->getBillingAddress();
+        $shippingAddress = $order->getProfile()?->getShippingAddress();
+        $billingAddress = $order->getProfile()?->getBillingAddress();
 
-        $shippingStreet = implode(' ', [$shippingAddress->getStreet(), $shippingAddress->getStreet2()]);
-        $record->addFieldValue(Sales_Orders::ShippingStreet(), $shippingStreet);
-        $record->addFieldValue(Sales_Orders::ShippingCity(), $shippingAddress->getCity());
-        $record->addFieldValue(Sales_Orders::ShippingCountry(), $shippingAddress->getCountryName());
-        $record->addFieldValue(Sales_Orders::ShippingState(), $shippingAddress->getStateName());
-        $record->addFieldValue(Sales_Orders::ShippingCode(), $shippingAddress->getZipcode());
-        $record->addFieldValue(new Field('shippingPhone'), $shippingAddress->getPhone());
-
-        $billingStreet = implode(' ', [$billingAddress->getStreet(), $billingAddress->getStreet2()]);
-        $record->addFieldValue(Sales_Orders::BillingStreet(), $billingStreet);
-        $record->addFieldValue(Sales_Orders::BillingCity(), $billingAddress->getCity());
-        $record->addFieldValue(Sales_Orders::BillingCountry(), $billingAddress->getCountryName());
-        $record->addFieldValue(Sales_Orders::BillingState(), $billingAddress->getStateName());
-        $record->addFieldValue(Sales_Orders::BillingCode(), $billingAddress->getZipcode());
-        $record->addFieldValue(new Field('billingPhone'), $billingAddress->getPhone());
+        $record = $this->getShippingAddress($record, Sales_Orders::class, $shippingAddress);
+        $record = $this->getBillingAddress($record, Sales_Orders::class, $billingAddress);
 
         $discount = $order->getSurchargeSumByType(Surcharge::TYPE_DISCOUNT);
         $record->addFieldValue(Sales_Orders::Discount(), (double) abs($discount));
