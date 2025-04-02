@@ -63,6 +63,9 @@ class Command implements ICommand
                         $zohoModel = new $modelClass();
                         $zohoModel->setId($model);
                         $model->setZohoModel($zohoModel);
+                    } else {
+                        $zohoModel->setErrors("");
+                        $zohoModel->setSkipped(false);
                     }
 
                     if ($actionResponse instanceof SuccessResponse) {

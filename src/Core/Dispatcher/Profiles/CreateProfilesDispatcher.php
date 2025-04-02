@@ -11,15 +11,17 @@ use XLite\Model\Profile;
 class CreateProfilesDispatcher
 {
     protected ExportMessage $message;
-    
-    public function __construct()
+
+    public function __construct($entityIds = [])
     {
-        $entityIds = Database::getRepo(Profile::class)->findProfileIdsToCreateInZoho();
-        
+        if (empty($entityIds)) {
+            $entityIds = Database::getRepo(Profile::class)->findProfileIdsToCreateInZoho();
+        }
+
         /** @var PushProfilesCommandFactory $commandFactory */
         $commandFactory = Container::getContainer() ? Container::getContainer()->get(PushProfilesCommandFactory::class) : null;
-        $command        = $commandFactory->createCommand($entityIds);
-        $this->message  = new ExportMessage($command);
+        $command = $commandFactory->createCommand($entityIds);
+        $this->message = new ExportMessage($command);
     }
 
     public function getMessage()
