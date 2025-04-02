@@ -51,3 +51,11 @@ XLite\Model\Config:
     translations:
       - code: en
         option_name: "Enable order synchronization"
+  - name: zoho_url
+    category: Iidev\ZohoCRM
+    type: XLite\View\FormField\Input\Text
+    orderBy: 80
+    value: false
+    translations:
+      - code: en
+        option_name: "Zoho Url"

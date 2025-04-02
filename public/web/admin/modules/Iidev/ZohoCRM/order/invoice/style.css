@@ -1,0 +1,9 @@
+.order-info .title-box {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.zoho-order h4 {
+    margin-bottom: 15px;
+}

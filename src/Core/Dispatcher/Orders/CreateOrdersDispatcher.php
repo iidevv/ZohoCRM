@@ -15,9 +15,11 @@ class CreateOrdersDispatcher extends Dispatcher
 
     protected array $orders = [];
 
-    public function __construct()
+    public function __construct($entityIds = [])
     {
-        $entityIds = Database::getRepo(Order::class)->findOrderIdsToCreateInZoho();
+        if (empty($entityIds)) {
+            $entityIds = Database::getRepo(Order::class)->findOrderIdsToCreateInZoho();
+        }
 
         $this->orders = Database::getRepo(Order::class)->findByIds($entityIds);
         $this->createProfilesAndProducts();

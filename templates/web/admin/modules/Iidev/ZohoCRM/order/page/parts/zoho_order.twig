@@ -1,0 +1,13 @@
+{##
+ #
+ # @ListChild (list="order.title.box", weight="150")
+ #}
+
+<div class="zoho-order">
+  <h4 class="head-h4">Zoho CRM</h4>
+  {% if this.getZohoUrl %}
+    {{ widget('XLite\\View\\Button\\Link', location=this.getZohoUrl, blank=true, label=t('Manage in Zoho')) }}
+  {% else %}
+    {{ widget('XLite\\View\\Button\\Link', location=xurl('zoho_orders', 'create_zoho_order', {'id': this.getOrderId}), label=t('Sync Order to Zoho')) }}
+  {% endif %}
+</div>
