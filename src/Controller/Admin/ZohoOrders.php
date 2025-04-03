@@ -36,7 +36,7 @@ class ZohoOrders extends Zoho
     {
         $order = \XLite\Core\Database::getRepo(\Iidev\ZohoCRM\Model\ZohoOrder::class)->find($id);
 
-        if ($order->getZohoId()) {
+        if ($order?->getZohoId()) {
             TopMessage::addInfo("Order was successfully added");
         } else {
             TopMessage::addError("Something went wrong, check Zoho order errors");

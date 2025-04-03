@@ -41,7 +41,7 @@ class Main extends \XLite\Module\AModule
     {
         $deletedProductPlaceholder = Database::getRepo(Product::class)->findOneBy(['product_id' => Config::getInstance()->Iidev->ZohoCRM->deleted_product_id]);
 
-        if (!$deletedProductPlaceholder) {
+        if (!$deletedProductPlaceholder?->getZohoModel()?->getZohoId()) {
             throw new \Exception('Deleted product placeholder not found');
         }
 
