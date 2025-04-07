@@ -16,7 +16,8 @@ class ZohoGeneral extends Zoho
         'debug_enabled',
         'orders_from_number',
         'orders_enable_sync',
-        'zoho_url'
+        'zoho_url',
+        'deals_from_date',
     ];
 
     protected function doActionInitialize()

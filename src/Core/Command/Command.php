@@ -152,6 +152,9 @@ class Command implements ICommand
             case \Iidev\ZohoCRM\Model\ZohoQuote::class:
                 return $model->getZohoQuote();
 
+            case \Iidev\ZohoCRM\Model\ZohoDeal::class:
+                return $model->getZohoDeal();
+
             default:
                 return $model->getZohoModel();
         }

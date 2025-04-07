@@ -59,3 +59,11 @@ XLite\Model\Config:
     translations:
       - code: en
         option_name: "Zoho Url"
+  - name: deals_from_date
+    category: Iidev\ZohoCRM
+    type: XLite\View\FormField\Input\Text\Date
+    orderBy: 90
+    value: 0
+    translations:
+      - code: en
+        option_name: "Start sync Deals from"

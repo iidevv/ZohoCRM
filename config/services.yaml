@@ -35,6 +35,8 @@ services:
   Iidev\ZohoCRM\Core\Dispatcher\Quotes\CreateQuotesDispatcher: ~
   Iidev\ZohoCRM\Core\Dispatcher\Quotes\UpdateQuotesDispatcher: ~
 
+  Iidev\ZohoCRM\Core\Dispatcher\Deals\CreateDealsDispatcher: ~
+
   # CommandFactory
 
   Iidev\ZohoCRM\Core\Factory\Commands\Products\PushProductsCommandFactory:
@@ -51,6 +53,8 @@ services:
 
   Iidev\ZohoCRM\Core\Factory\Commands\Quotes\PushQuotesCommandFactory:
   Iidev\ZohoCRM\Core\Factory\Commands\Quotes\UpdateQuotesCommandFactory:
+
+  Iidev\ZohoCRM\Core\Factory\Commands\Deals\PushDealsCommandFactory:
 
   # Task
 
@@ -141,6 +145,14 @@ services:
           event: zoho.cronjob,
           method: handleTask,
         }
+  
+  Iidev\ZohoCRM\Core\Task\Deals\CreateDeals:
+    tags:
+      - {
+          name: kernel.event_listener,
+          event: zoho.cronjob,
+          method: handleTask,
+        }
 
   # Command
 
@@ -191,3 +203,7 @@ services:
   Iidev\ZohoCRM\Command\Quotes\UpdateQuotesCommand:
     tags:
       - { name: "console.command", command: "ZohoCRM:UpdateQuotes" }
+  
+  Iidev\ZohoCRM\Command\Deals\CreateDealsCommand:
+    tags:
+      - { name: "console.command", command: "ZohoCRM:CreateDeals" }

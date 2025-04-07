@@ -42,6 +42,8 @@ class Order extends \XLite\Model\Order implements ZohoAwareInterface
     {
         if ($zohoModel instanceof \Iidev\ZohoCRM\Model\ZohoQuote) {
             $this->zohoQuote = $zohoModel;
+        } else if ($zohoModel instanceof \Iidev\ZohoCRM\Model\ZohoDeal) {
+            $this->zohoDeal = $zohoModel;
         } else {
             $this->zohoModel = $zohoModel;
         }
