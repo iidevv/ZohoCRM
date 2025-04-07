@@ -42,7 +42,7 @@ class Cart extends \XLite\Model\Repo\Cart
 
             ->select('c.order_id')
             ->orderBy('c.lastVisitDate', 'DESC')
-            ->setMaxResults(5)
+            ->setMaxResults(50)
             ->getQuery()
             ->getSingleColumnResult();
     }

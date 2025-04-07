@@ -73,6 +73,10 @@ class PushDealsCommand extends Command
         $date = new \DateTime('@' . $order->getDate());
         $record->addFieldValue(Deals::ClosingDate(), $date);
 
+        $lastVisitDate = new \DateTime('@' . $order->getLastVisitDate());
+        $record->addFieldValue(new Field('lastVisitDate'), $lastVisitDate);
+        $record->addFieldValue(new Field('profileUrl'), $this->getProfileUrl($order->getOrigProfile()));
+
         $record->addFieldValue(Deals::Stage(), new Choice('Qualification'));
 
         $name = $order->getProfile()?->getLogin() ?? "#{$order->getOrderId()}";
@@ -81,6 +85,8 @@ class PushDealsCommand extends Command
         $record->addFieldValue(new Field('entityId'), (string) $order->getOrderId());
 
         $record->addFieldValue(Deals::Amount(), (double) abs($order->getTotal()));
+
+        $record->addFieldValue(Deals::Description(), $this->getItemsDescription($order->getItems()));
 
         $profileId = $order->getOrigProfile()?->getZohoModel()?->getZohoId();
 
@@ -96,5 +102,58 @@ class PushDealsCommand extends Command
         $record->addFieldValue(Deals::Owner(), $owner);
 
         return $record;
+    }
+
+    protected function getItemsDescription($items)
+    {
+        if (empty($items)) {
+            return 'Empty abandoned cart';
+        }
+
+        $description = "Items:\n\n";
+
+        foreach ($items as $index => $item) {
+            $lines = [];
+
+            $itemSku = $item->getSku();
+            $itemName = $item->getName();
+
+            $quantity = $item->getAmount();
+
+            $deletedText = !$item->getProduct()->isPersistent()
+                ? ' (deleted)'
+                : '';
+
+            $itemNumber = $index + 1;
+            $lines[] = "{$itemNumber}. {$itemName} ({$itemSku}) x{$quantity}{$deletedText}";
+
+            if ($item->hasAttributeValues()) {
+                foreach ($item->getAttributeValues() as $av) {
+                    $lines[] = "  {$av->getName()}: {$av->getValue()}";
+                }
+            }
+
+            $lines[] = "\n";
+
+            $description .= implode("\n", $lines) . "\n";
+        }
+
+        return rtrim($description, "\n");
+    }
+
+    protected function getProfileUrl($profile)
+    {
+        $profileId = $profile?->getProfileId();
+
+        if (!$profileId) {
+            return '';
+        }
+
+        return \XLite\Core\Converter::buildFullURL(
+            'profile',
+            '',
+            ['profile_id' => $profileId],
+            \XLite::getAdminScript()
+        );
     }
 }
