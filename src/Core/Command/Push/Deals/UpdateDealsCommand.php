@@ -62,10 +62,6 @@ class UpdateDealsCommand extends Command
         $lastVisitDate = new \DateTime('@' . $order->getLastVisitDate());
         $record->addFieldValue(new Field('lastVisitDate'), $lastVisitDate);
 
-        if ($order->getLost()) {
-            $record->addFieldValue(Deals::Stage(), new Choice('Closed Lost'));
-        }
-
         if ($order->getTotal() !== $order->getZohoDeal()->getTotal()) {
             $record->addFieldValue(Deals::Amount(), (double) abs($order->getTotal()));
 
