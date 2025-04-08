@@ -95,6 +95,7 @@ class UpdateClosedDealsCommand extends Command
 
         if ($orderId) {
             $record->addFieldValue(Deals::Stage(), new Choice('Closed Won'));
+            $record->addFieldValue(Deals::Amount(), (double) abs($zohoDeal->getId()->getTotal()));
         }
 
         return $record;
