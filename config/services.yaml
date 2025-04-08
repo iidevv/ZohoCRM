@@ -57,7 +57,7 @@ services:
 
   Iidev\ZohoCRM\Core\Factory\Commands\Deals\PushDealsCommandFactory:
   Iidev\ZohoCRM\Core\Factory\Commands\Deals\UpdateDealsCommandFactory:
-  Iidev\ZohoCRM\Core\Factory\Commands\Deals\UpdateClosedWonDealsCommandFactory:
+  Iidev\ZohoCRM\Core\Factory\Commands\Deals\UpdateClosedDealsCommandFactory:
 
   # Task
 

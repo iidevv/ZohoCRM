@@ -9,15 +9,15 @@ use XCart\Extender\Mapping\Extender;
  */
 class ZohoDeal extends \XLite\Model\Repo\ARepo
 {
-    public function findClosedWonDealIdsToUpdateInZoho()
+    public function findClosedDealIdsToUpdateInZoho()
     {
         return $this->createQueryBuilder('zd')
             ->leftJoin('zd.order_id', 'o')
             ->andWhere('zd.zoho_id IS NOT NULL')
-            ->andWhere('zd.closed_won = true')
+            ->andWhere('zd.closed_won = true OR zd.order_id IS NULL')
             ->andWhere('zd.skipped = false OR zd.skipped IS NULL')
-            ->select('o.order_id')
-            ->orderBy('o.order_id', 'DESC')
+            ->select('zd.id')
+            ->orderBy('zd.id', 'DESC')
             ->setMaxResults(25)
             ->getQuery()
             ->getSingleColumnResult();

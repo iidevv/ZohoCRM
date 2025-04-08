@@ -16,10 +16,16 @@ use XLite\Model\AEntity;
 class ZohoDeal extends AEntity
 {
     /**
-     * @var \XLite\Model\Order
      * @ORM\Id
+     * @ORM\GeneratedValue(strategy="AUTO")
+     * @ORM\Column(type="integer")
+     */
+    protected $id;
+
+    /**
+     * @var \XLite\Model\Order
      * @ORM\OneToOne(targetEntity="XLite\Model\Order", cascade={"merge", "detach", "persist"})
-     * @ORM\JoinColumn(name="order_id", referencedColumnName="order_id", onDelete="CASCADE")
+     * @ORM\JoinColumn(name="order_id", referencedColumnName="order_id", onDelete="SET NULL", nullable=true)
      */
     protected $order_id;
 
@@ -47,7 +53,7 @@ class ZohoDeal extends AEntity
      * @ORM\Column(type="boolean")
      */
     protected $closed_won = false;
-    
+
     /**
      * @var boolean
      * @ORM\Column(type="boolean")

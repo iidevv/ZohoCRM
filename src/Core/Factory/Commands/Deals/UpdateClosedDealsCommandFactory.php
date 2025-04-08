@@ -2,9 +2,9 @@
 
 namespace Iidev\ZohoCRM\Core\Factory\Commands\Deals;
 
-use Iidev\ZohoCRM\Core\Command\Push\Deals\UpdateClosedWonDealsCommand;
+use Iidev\ZohoCRM\Core\Command\Push\Deals\UpdateClosedDealsCommand;
 
-class UpdateClosedWonDealsCommandFactory
+class UpdateClosedDealsCommandFactory
 {
     public function __construct()
     {
@@ -12,6 +12,6 @@ class UpdateClosedWonDealsCommandFactory
 
     public function createCommand(array $entityIds)
     {
-        return new UpdateClosedWonDealsCommand($entityIds);
+        return new UpdateClosedDealsCommand($entityIds);
     }
 }

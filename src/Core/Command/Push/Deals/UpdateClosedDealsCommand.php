@@ -17,7 +17,7 @@ use com\zoho\crm\api\record\SuccessResponse;
 use com\zoho\crm\api\record\APIException;
 use XLite\Core\Database;
 
-class UpdateClosedWonDealsCommand extends Command
+class UpdateClosedDealsCommand extends Command
 {
     public function __construct(
         array $entityIds,
@@ -48,7 +48,7 @@ class UpdateClosedWonDealsCommand extends Command
          
             $this->processUpdateResult(ZohoDeal::class, $response);
         } catch (Exception $e) {
-            $this->getLogger('ZohoCRM')->error('UpdateClosedWonDealsCommand Error:', [
+            $this->getLogger('ZohoCRM')->error('UpdateClosedDealsCommand Error:', [
                 'message' => $e->getMessage(),
                 'trace' => $e->getTrace(),
             ]);
@@ -75,6 +75,12 @@ class UpdateClosedWonDealsCommand extends Command
         $record = new Record();
 
         $record->addFieldValue(Deals::id(), $zohoId);
+
+        if(!$zohoDeal->getId()) {
+            $record->addFieldValue(Deals::Stage(), new Choice('Closed Lost'));
+            
+            return $record;
+        }
         
         $lastVisitDate = new \DateTime('@' . $zohoDeal->getId()?->getLastVisitDate());
         $record->addFieldValue(new Field('lastVisitDate'), $lastVisitDate);

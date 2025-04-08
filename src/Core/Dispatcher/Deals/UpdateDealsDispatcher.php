@@ -3,7 +3,7 @@
 namespace Iidev\ZohoCRM\Core\Dispatcher\Deals;
 
 use Iidev\ZohoCRM\Core\Factory\Commands\Deals\UpdateDealsCommandFactory;
-use Iidev\ZohoCRM\Core\Factory\Commands\Deals\UpdateClosedWonDealsCommandFactory;
+use Iidev\ZohoCRM\Core\Factory\Commands\Deals\UpdateClosedDealsCommandFactory;
 use Iidev\ZohoCRM\Messenger\Message\ExportMessage;
 use XCart\Container;
 use XLite\Core\Database;
@@ -27,11 +27,11 @@ class UpdateDealsDispatcher extends Dispatcher
         $this->message = new ExportMessage($command);
 
 
-        $closedWonEntityIds = Database::getRepo(ZohoDeal::class)->findClosedWonDealIdsToUpdateInZoho();
+        $closedEntityIds = Database::getRepo(ZohoDeal::class)->findClosedDealIdsToUpdateInZoho();
 
-        /** @var UpdateClosedWonDealsCommandFactory $commandFactory */
-        $commandFactory = Container::getContainer() ? Container::getContainer()->get(UpdateClosedWonDealsCommandFactory::class) : null;
-        $command = $commandFactory->createCommand($closedWonEntityIds);
+        /** @var UpdateClosedDealsCommandFactory $commandFactory */
+        $commandFactory = Container::getContainer() ? Container::getContainer()->get(UpdateClosedDealsCommandFactory::class) : null;
+        $command = $commandFactory->createCommand($closedEntityIds);
         $this->message = new ExportMessage($command);
     }
 
