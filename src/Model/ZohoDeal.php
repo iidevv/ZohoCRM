@@ -30,10 +30,23 @@ class ZohoDeal extends AEntity
     protected $zoho_id;
 
     /**
+     * @var float
+     *
+     * @ORM\Column (type="decimal", precision=14, scale=4)
+     */
+    protected $total = 0.0000;
+
+    /**
      * @var boolean
      * @ORM\Column(type="boolean")
      */
     protected $synced = true;
+
+    /**
+     * @var boolean
+     * @ORM\Column(type="boolean")
+     */
+    protected $closed_won = false;
     
     /**
      * @var boolean
@@ -69,6 +82,17 @@ class ZohoDeal extends AEntity
         return $this;
     }
 
+    public function getTotal()
+    {
+        return $this->total;
+    }
+
+    public function setTotal($total): self
+    {
+        $this->total = $total;
+        return $this;
+    }
+
     public function getSynced()
     {
         return $this->synced;
@@ -88,6 +112,17 @@ class ZohoDeal extends AEntity
     public function setSkipped($skipped): self
     {
         $this->skipped = $skipped;
+        return $this;
+    }
+
+    public function getClosedWon()
+    {
+        return $this->closed_won;
+    }
+
+    public function setClosedWon($closed_won): self
+    {
+        $this->closed_won = $closed_won;
         return $this;
     }
 

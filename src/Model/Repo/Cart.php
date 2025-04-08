@@ -53,10 +53,11 @@ class Cart extends \XLite\Model\Repo\Cart
             ->leftJoin('c.zohoDeal', 'zd')
             ->andWhere('zd.zoho_id IS NOT NULL')
             ->andWhere('zd.synced = false')
+            ->andWhere('zd.closed_won = false')
             ->andWhere('zd.skipped = false OR zd.skipped IS NULL')
             ->select('c.order_id')
             ->orderBy('c.order_id', 'DESC')
-            ->setMaxResults(50)
+            ->setMaxResults(25)
             ->getQuery()
             ->getSingleColumnResult();
     }

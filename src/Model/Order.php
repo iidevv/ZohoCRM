@@ -108,4 +108,31 @@ class Order extends \XLite\Model\Order implements ZohoAwareInterface
             $this->zohoQuote->setSynced(false);
         }
     }
+
+    public function setOrderNumber($orderNumber)
+    {
+        if ($this->zohoDeal) {
+            $this->zohoDeal->setClosedWon(true);
+        }
+        
+        return parent::setOrderNumber($orderNumber);
+    }
+
+    public function setLost($lost)
+    {
+        if ($this->zohoDeal) {
+            $this->zohoDeal->setSynced(false);
+        }
+
+        return parent::setLost($lost);
+    }
+
+    public function setLastVisitDate($lastVisitDate)
+    {
+        if ($this->zohoDeal) {
+            $this->zohoDeal->setSynced(false);
+        }
+
+        return parent::setLastVisitDate($lastVisitDate);
+    }
 }

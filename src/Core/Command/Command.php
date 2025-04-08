@@ -84,9 +84,7 @@ class Command implements ICommand
                         $zohoModel->setSkipped(true);
                     }
 
-                    if (($zohoModel instanceof \Iidev\ZohoCRM\Model\ZohoOrder) || ($zohoModel instanceof \Iidev\ZohoCRM\Model\ZohoQuote)) {
-                        $zohoModel->setTotal($model->getTotal());
-                    }
+                    $zohoModel->setTotal($model->getTotal());
 
                     Database::getEM()->persist($zohoModel);
                     $index++;
@@ -272,5 +270,55 @@ class Command implements ICommand
         }, '');
 
         return $model->getProduct()->getName() . ' ' . trim($attrsString);
+    }
+
+    protected function getCarts()
+    {
+        $records = [];
+        $orders = Database::getRepo(\XLite\Model\Cart::class)->findByIds($this->entityIds);
+
+        foreach ($orders as $order) {
+            $records[] = $this->getCart($order);
+            $this->entities[] = $order;
+        }
+
+        return $records;
+    }
+
+    protected function getItemsDescription($items)
+    {
+        if (empty($items)) {
+            return 'Empty abandoned cart';
+        }
+
+        $description = "Items:\n\n";
+
+        foreach ($items as $index => $item) {
+            $lines = [];
+
+            $itemSku = $item->getSku();
+            $itemName = $item->getName();
+
+            $quantity = $item->getAmount();
+
+            $deletedText = !$item->getProduct()->isPersistent()
+                ? ' (deleted)'
+                : '';
+
+            $itemNumber = $index + 1;
+            $lines[] = "{$itemNumber}. {$itemName} ({$itemSku}) x{$quantity}{$deletedText}";
+
+            if ($item->hasAttributeValues()) {
+                foreach ($item->getAttributeValues() as $av) {
+                    $lines[] = "  {$av->getName()}: {$av->getValue()}";
+                }
+            }
+
+            $lines[] = "\n";
+
+            $description .= implode("\n", $lines) . "\n";
+        }
+
+        return rtrim($description, "\n");
     }
 }

@@ -36,6 +36,7 @@ services:
   Iidev\ZohoCRM\Core\Dispatcher\Quotes\UpdateQuotesDispatcher: ~
 
   Iidev\ZohoCRM\Core\Dispatcher\Deals\CreateDealsDispatcher: ~
+  Iidev\ZohoCRM\Core\Dispatcher\Deals\UpdateDealsDispatcher: ~
 
   # CommandFactory
 
@@ -55,6 +56,8 @@ services:
   Iidev\ZohoCRM\Core\Factory\Commands\Quotes\UpdateQuotesCommandFactory:
 
   Iidev\ZohoCRM\Core\Factory\Commands\Deals\PushDealsCommandFactory:
+  Iidev\ZohoCRM\Core\Factory\Commands\Deals\UpdateDealsCommandFactory:
+  Iidev\ZohoCRM\Core\Factory\Commands\Deals\UpdateClosedWonDealsCommandFactory:
 
   # Task
 
@@ -153,6 +156,14 @@ services:
           event: zoho.cronjob,
           method: handleTask,
         }
+  
+  Iidev\ZohoCRM\Core\Task\Deals\UpdateDeals:
+    tags:
+      - {
+          name: kernel.event_listener,
+          event: zoho.cronjob,
+          method: handleTask,
+        }
 
   # Command
 
@@ -207,3 +218,7 @@ services:
   Iidev\ZohoCRM\Command\Deals\CreateDealsCommand:
     tags:
       - { name: "console.command", command: "ZohoCRM:CreateDeals" }
+  
+  Iidev\ZohoCRM\Command\Deals\UpdateDealsCommand:
+    tags:
+      - { name: "console.command", command: "ZohoCRM:UpdateDeals" }
