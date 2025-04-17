@@ -251,15 +251,15 @@ class Command implements ICommand
     {
         $paymentStatus = $order->getPaymentStatus()?->getCode();
 
-        if ($paymentStatus === \XLite\Model\Order\Status\Payment::STATUS_QUEUED || $paymentStatus === \XLite\Model\Order\Status\Payment::STATUS_AUTHORIZED) {
-            return static::QUOTE_ON_HOLD;
+        if ($paymentStatus === \XLite\Model\Order\Status\Payment::STATUS_CANCELED) {
+            return static::QUOTE_CLOSED_LOST;
         }
 
         if ($paymentStatus === \XLite\Model\Order\Status\Payment::STATUS_PAID || $paymentStatus === \XLite\Model\Order\Status\Payment::STATUS_PART_PAID) {
             return static::QUOTE_CLOSED_WON;
         }
 
-        return static::QUOTE_CLOSED_LOST;
+        return static::QUOTE_ON_HOLD;
     }
 
     protected function getVariantTitle(ProductVariant $model)
