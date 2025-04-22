@@ -250,12 +250,13 @@ class Command implements ICommand
     protected function getQuoteStage(Order $order)
     {
         $paymentStatus = $order->getPaymentStatus()?->getCode();
-
-        if ($paymentStatus === \XLite\Model\Order\Status\Payment::STATUS_CANCELED) {
+        $shippingStatusId = $order->getShippingStatus()?->getId();
+        
+        if ($shippingStatusId === 20) {
             return static::QUOTE_CLOSED_LOST;
         }
 
-        if ($paymentStatus === \XLite\Model\Order\Status\Payment::STATUS_PAID || $paymentStatus === \XLite\Model\Order\Status\Payment::STATUS_PART_PAID) {
+        if ($paymentStatus === \XLite\Model\Order\Status\Payment::STATUS_PAID && $shippingStatusId === 4) {
             return static::QUOTE_CLOSED_WON;
         }
 

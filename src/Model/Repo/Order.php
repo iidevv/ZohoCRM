@@ -72,10 +72,11 @@ class Order extends \XLite\Model\Repo\Order
 
         $qb = $this->createQueryBuilder('o')
             ->leftJoin('o.zohoQuote', 'zq')
-            ->andWhere('o.payment_method_name = :paymentMethod')
+            ->andWhere('o.payment_method_name IN (:quote, :wireTransfer)')
             ->andWhere('zq.zoho_id IS NULL')
             ->andWhere('zq.skipped = false OR zq.skipped IS NULL')
-            ->setParameter('paymentMethod', 'Quote')
+            ->setParameter('quote', 'Quote')
+            ->setParameter('wireTransfer', 'Wire Transfer')
             ->select('o.order_id')
             ->orderBy('o.orderNumber', 'DESC')
             ->setMaxResults(50);

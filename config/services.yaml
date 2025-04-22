@@ -109,6 +109,22 @@ services:
           method: handleTask,
         }
 
+  Iidev\ZohoCRM\Core\Task\Quotes\CreateQuotes:
+    tags:
+      - {
+          name: kernel.event_listener,
+          event: zoho.cronjob,
+          method: handleTask,
+        }
+
+  Iidev\ZohoCRM\Core\Task\Quotes\UpdateQuotes:
+    tags:
+      - {
+          name: kernel.event_listener,
+          event: zoho.cronjob,
+          method: handleTask,
+        }
+
   Iidev\ZohoCRM\Core\Task\Orders\CreateOrders:
     tags:
       - {
@@ -126,22 +142,6 @@ services:
         }
 
   Iidev\ZohoCRM\Core\Task\Orders\CreateOrderMessages:
-    tags:
-      - {
-          name: kernel.event_listener,
-          event: zoho.cronjob,
-          method: handleTask,
-        }
-
-  Iidev\ZohoCRM\Core\Task\Quotes\CreateQuotes:
-    tags:
-      - {
-          name: kernel.event_listener,
-          event: zoho.cronjob,
-          method: handleTask,
-        }
-
-  Iidev\ZohoCRM\Core\Task\Quotes\UpdateQuotes:
     tags:
       - {
           name: kernel.event_listener,
