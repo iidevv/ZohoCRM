@@ -252,11 +252,16 @@ class Command implements ICommand
         $paymentStatus = $order->getPaymentStatus()?->getCode();
         $shippingStatusId = $order->getShippingStatus()?->getId();
         
-        if ($shippingStatusId === 20) {
+        $cancelled = $shippingStatusId === 20;
+
+        if ($cancelled) {
             return static::QUOTE_CLOSED_LOST;
         }
 
-        if ($paymentStatus === \XLite\Model\Order\Status\Payment::STATUS_PAID && $shippingStatusId === 4) {
+        $paidAndComplete = $paymentStatus === \XLite\Model\Order\Status\Payment::STATUS_PAID && $shippingStatusId === 4;
+        $orderPlaced = $shippingStatusId === 22;
+        
+        if ($paidAndComplete || $orderPlaced) {
             return static::QUOTE_CLOSED_WON;
         }
 
