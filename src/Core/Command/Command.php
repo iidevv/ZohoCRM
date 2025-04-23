@@ -215,6 +215,21 @@ class Command implements ICommand
         return (double) $adjustment;
     }
 
+    protected function getNotes($notes)
+    {
+        if ($notes) {
+            $maxLength = 2000;
+            $readMore = '... read more on the website';
+            $readMoreLength = strlen($readMore);
+            if (strlen($notes) >= $maxLength) {
+                $trimmedNotes = substr($notes, 0, $maxLength - $readMoreLength);
+                return $trimmedNotes . $readMore;
+            }
+            return $notes;
+        }
+        return '';
+    }
+
     protected function getShippingAddress($record, $recordClass, $shippingAddress)
     {
         if (empty($shippingAddress))
@@ -251,7 +266,7 @@ class Command implements ICommand
     {
         $paymentStatus = $order->getPaymentStatus()?->getCode();
         $shippingStatusId = $order->getShippingStatus()?->getId();
-        
+
         $cancelled = $shippingStatusId === 20;
 
         if ($cancelled) {
@@ -260,7 +275,7 @@ class Command implements ICommand
 
         $paidAndComplete = $paymentStatus === \XLite\Model\Order\Status\Payment::STATUS_PAID && $shippingStatusId === 4;
         $orderPlaced = $shippingStatusId === 22;
-        
+
         if ($paidAndComplete || $orderPlaced) {
             return static::QUOTE_CLOSED_WON;
         }

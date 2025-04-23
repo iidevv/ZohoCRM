@@ -73,9 +73,9 @@ class UpdateQuotesCommand extends Command
         $record = $this->getShippingAddress($record, Quotes::class, $shippingAddress);
         $record = $this->getBillingAddress($record, Quotes::class, $billingAddress);
 
-        $record->addFieldValue(new Field('customerNotes'), $order->getNotes());
+        $record->addFieldValue(new Field('customerNotes'), $this->getNotes($order->getNotes()));
 
-        $record->addFieldValue(new Field('staffNotes'), $order->getAdminNotes());
+        $record->addFieldValue(new Field('staffNotes'), $this->getNotes($order->getAdminNotes()));
 
         $profileId = $order->getOrigProfile()?->getZohoModel()?->getZohoId();
 

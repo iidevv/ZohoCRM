@@ -79,9 +79,9 @@ class PushQuotesCommand extends Command
 
         $record->addFieldValue(Quotes::Adjustment(), $this->getAdjustment($order));
 
-        $record->addFieldValue(new Field('customerNotes'), $order->getNotes());
+        $record->addFieldValue(new Field('customerNotes'), $this->getNotes($order->getNotes()));
 
-        $record->addFieldValue(new Field('staffNotes'), $order->getAdminNotes());
+        $record->addFieldValue(new Field('staffNotes'), $this->getNotes($order->getAdminNotes()));
 
         $profileId = $order->getOrigProfile()?->getZohoModel()?->getZohoId();
 
