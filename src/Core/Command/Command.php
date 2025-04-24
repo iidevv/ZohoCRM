@@ -264,20 +264,41 @@ class Command implements ICommand
 
     protected function getQuoteStage(Order $order)
     {
-        $paymentStatus = $order->getPaymentStatus()?->getCode();
         $shippingStatusId = $order->getShippingStatus()?->getId();
 
-        $cancelled = $shippingStatusId === 20;
+        $closedWon = [
+            4,
+            10,
+            11,
+            12,
+            2,
+            3,
+            14,
+            23,
+            17,
+            22,
+            16,
+            18,
+            7,
+            13,
+            15,
+            8
+        ];
 
-        if ($cancelled) {
-            return static::QUOTE_CLOSED_LOST;
+        $closedLost = [
+            20,
+            5,
+            6,
+            19,
+            9
+        ];
+
+        if (in_array($shippingStatusId, $closedWon)) {
+            return static::QUOTE_CLOSED_WON;
         }
 
-        $paidAndComplete = $paymentStatus === \XLite\Model\Order\Status\Payment::STATUS_PAID && $shippingStatusId === 4;
-        $orderPlaced = $shippingStatusId === 22;
-
-        if ($paidAndComplete || $orderPlaced) {
-            return static::QUOTE_CLOSED_WON;
+        if (in_array($shippingStatusId, $closedLost)) {
+            return static::QUOTE_CLOSED_LOST;
         }
 
         return static::QUOTE_ON_HOLD;
