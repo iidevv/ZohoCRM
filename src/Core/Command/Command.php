@@ -76,12 +76,7 @@ class Command implements ICommand
                             $zohoModel->setZohoId($zohoId);
                         }
                     } elseif ($actionResponse instanceof APIException) {
-                        $errors = [
-                            "message" => $actionResponse->getMessage() instanceof Choice ? $actionResponse->getMessage()->getValue() : $actionResponse->getMessage(),
-                            "details" => $actionResponse->getDetails(),
-                        ];
-                        $zohoModel->setErrors(json_encode($errors));
-                        $zohoModel->setSkipped(true);
+                        $this->handleCreateError($zohoModel, $actionResponse);
                     }
 
                     $zohoModel->setTotal($model->getTotal());
@@ -99,6 +94,23 @@ class Command implements ICommand
                 ]);
             }
         }
+    }
+
+    protected function handleCreateError($zohoModel, $actionResponse)
+    {
+        $details = $actionResponse->getDetails();
+
+        if (isset($details['duplicate_record']) && !empty($details['duplicate_record']['id'])) {
+            $zohoModel->setZohoId($details['duplicate_record']['id']);
+            return;
+        }
+
+        $errors = [
+            "message" => $actionResponse->getMessage() instanceof Choice ? $actionResponse->getMessage()->getValue() : $actionResponse->getMessage(),
+            "details" => $actionResponse->getDetails(),
+        ];
+        $zohoModel->setErrors(json_encode($errors));
+        $zohoModel->setSkipped(true);
     }
 
     protected function processUpdateResult($modelClass, $response)
